@@ -1,0 +1,204 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_styles.dart';
+import '../../checkout/screens/checkout_screen.dart';
+import '../models/cart_model.dart';
+import '../services/cart_service.dart';
+import '../../../core/widgets/custom_button.dart';
+ // Thêm import này
+
+class CartScreen extends StatelessWidget {
+  const CartScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final cartService = Provider.of<CartService>(context);
+    final items = cartService.items;
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        title: const Text('Giỏ hàng của bạn'),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: items.isEmpty
+          ? const Center(
+              child: Text('Giỏ hàng của bạn đang trống'),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (ctx, i) => CartItemWidget(cartItem: items[i]),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                        offset: const Offset(0, -3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Tạm tính',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          Text(
+                            '${_formatCurrency(cartService.totalAmount)} đ',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      CustomButton(
+                        text: 'Mua ngay',
+                        onPressed: () {
+                          // Chuyển đến màn hình thanh toán
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CheckoutScreen(),
+                            ),
+                          );
+                        },
+                        isPrimary: true,
+                        isFullWidth: true,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+
+  String _formatCurrency(int price) {
+    String priceString = price.toString();
+    final result = StringBuffer();
+    for (int i = 0; i < priceString.length; i++) {
+      if ((priceString.length - i) % 3 == 0 && i > 0) {
+        result.write('.');
+      }
+      result.write(priceString[i]);
+    }
+    return result.toString();
+  }
+}
+
+class CartItemWidget extends StatelessWidget {
+  final CartItem cartItem;
+
+  const CartItemWidget({Key? key, required this.cartItem}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final cartService = Provider.of<CartService>(context, listen: false);
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            // Hình ảnh sản phẩm
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                image: DecorationImage(
+                  image: AssetImage(cartItem.image),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Thông tin sản phẩm
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    cartItem.name,
+                    style: AppStyles.bodyText,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${_formatCurrency(cartItem.price)} đ',
+                    style: AppStyles.bodyText.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Số lượng
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove, size: 20),
+                  onPressed: () {
+                    cartService.updateQuantity(cartItem.id, cartItem.quantity - 1);
+                  },
+                ),
+                Text(
+                  '${cartItem.quantity}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add, size: 20),
+                  onPressed: () {
+                    cartService.updateQuantity(cartItem.id, cartItem.quantity + 1);
+                  },
+                ),
+              ],
+            ),
+            // Nút xóa
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              onPressed: () {
+                cartService.removeItem(cartItem.id);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatCurrency(int price) {
+    String priceString = price.toString();
+    final result = StringBuffer();
+    for (int i = 0; i < priceString.length; i++) {
+      if ((priceString.length - i) % 3 == 0 && i > 0) {
+        result.write('.');
+      }
+      result.write(priceString[i]);
+    }
+    return result.toString();
+  }
+}
