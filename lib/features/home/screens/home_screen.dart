@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_styles.dart';
 import '../../products/screens/order_screen.dart';
-import '../../profile/screens/points_screen.dart';  // Khôi phục import này
-import '../../profile/screens/member_screen.dart';  
+import '../../profile/screens/points_screen.dart';
+import '../../profile/screens/member_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../profile/screens/rewards_screen.dart';
 import 'promotions_screen.dart';
@@ -19,11 +19,10 @@ import 'feedback_screen.dart';
 import 'survey_screen.dart';
 import 'news_screen.dart';
 
-// Thêm import
 import 'package:provider/provider.dart';
 import '../../notifications/services/notification_service.dart';
 import '../../notifications/screens/notifications_screen.dart';
-import '../../orders/screens/return_exchange_screen.dart'; // Di chuyển import này lên đây
+import '../../orders/screens/return_exchange_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -47,11 +46,11 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Xin chào,',
+                  'Hello,',
                   style: TextStyle(fontSize: 14, color: Colors.white),
                 ),
                 Text(
-                  'Nguyễn Hoàng Thái',  // Cập nhật tên người dùng theo hình
+                  'Nguyễn Hoàng Thái',
                   style: AppStyles.bodyText.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -60,7 +59,7 @@ class HomeScreen extends StatelessWidget {
             Consumer<NotificationService>(
               builder: (context, notificationService, _) {
                 final unreadCount = notificationService.unreadCount;
-                
+
                 return Stack(
                   children: [
                     IconButton(
@@ -103,7 +102,6 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Member display (thay đổi từ Points display)
             GestureDetector(
               onTap: () {
                 Navigator.of(context).push(
@@ -137,7 +135,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Member',  // Thay đổi từ 'Thành viên' sang 'Member'
+                      'Member',
                       style: AppStyles.bodyText,
                     ),
                     const Spacer(),
@@ -149,8 +147,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
-            // Feature grid
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: GridView.count(
@@ -159,43 +155,39 @@ class HomeScreen extends StatelessWidget {
                 crossAxisCount: 4,
                 childAspectRatio: 0.9,
                 children: [
-                  _buildFeatureItem(context, Icons.qr_code, 'Tích điểm'),
-                  _buildFeatureItem(context, Icons.card_giftcard, 'Đổi thưởng'),
-                  _buildFeatureItem(context, Icons.shopping_bag_outlined, 'Đặt hàng'),
-                  _buildFeatureItem(context, Icons.swap_horiz, 'Thu đổi'), // Thêm chức năng "Thu đổi"
-                  _buildFeatureItem(context, Icons.phone, 'Liên hệ'),
-                  _buildFeatureItem(context, Icons.security, 'Bảo hành'),
-                  _buildFeatureItem(context, Icons.local_shipping_outlined, 'Theo dõi'),
-                  _buildFeatureItem(context, Icons.support_agent, 'Hỗ trợ'),
-                  _buildFeatureItem(context, Icons.rate_review_outlined, 'Phiếu góp ý'),
-                  _buildFeatureItem(context, Icons.assignment_outlined, 'Phiếu khảo sát'),
-                  _buildFeatureItem(context, Icons.newspaper, 'Tin tức'),
+                  _buildFeatureItem(context, Icons.qr_code, 'Earn Points'),
+                  _buildFeatureItem(context, Icons.card_giftcard, 'Redeem'),
+                  _buildFeatureItem(context, Icons.shopping_bag_outlined, 'Order'),
+                  _buildFeatureItem(context, Icons.swap_horiz, 'Exchange'),
+                  _buildFeatureItem(context, Icons.phone, 'Contact'),
+                  _buildFeatureItem(context, Icons.security, 'Warranty'),
+                  _buildFeatureItem(context, Icons.local_shipping_outlined, 'Tracking'),
+                  _buildFeatureItem(context, Icons.support_agent, 'Support'),
+                  _buildFeatureItem(context, Icons.rate_review_outlined, 'Feedback'),
+                  _buildFeatureItem(context, Icons.assignment_outlined, 'Survey'),
+                  _buildFeatureItem(context, Icons.newspaper, 'News'),
                 ],
               ),
             ),
-            
-            // News section
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Tin tức',
+                    'News',
                     style: AppStyles.heading,
                   ),
                   TextButton(
                     onPressed: () {},
                     child: Text(
-                      'Xem thêm',
+                      'View More',
                       style: AppStyles.bodyTextSmall.copyWith(color: AppColors.primary),
                     ),
                   ),
                 ],
               ),
             ),
-            
-            // News card
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
@@ -227,12 +219,12 @@ class HomeScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'ĐẶP "HỘP MƯ" NHẬN ƯU ĐÃI',
+                          'UNBOX TO RECEIVE REWARDS',
                           style: AppStyles.heading,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Lên tới 2.500.000đ',
+                          'Up to 2,500,000đ',
                           style: AppStyles.bodyText,
                         ),
                       ],
@@ -251,31 +243,27 @@ class HomeScreen extends StatelessWidget {
         currentIndex: 0,
         onTap: (index) {
           if (index == 1) {
-            // Navigate to Promotions
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => const PromotionsScreen()),
             );
           } else if (index == 3) {
-            // Navigate to Branch
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => const BranchScreen()),
             );
           } else if (index == 4) {
-            // Navigate to Profile
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => const ProfileScreen()),
             );
           }
-          // Other tabs will be implemented later
         },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Trang chủ',
+            label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.card_giftcard),
-            label: 'Ưu đãi',
+            label: 'Promotions',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.qr_code_scanner),
@@ -283,11 +271,11 @@ class HomeScreen extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_bag),
-            label: 'Chi nhánh',
+            label: 'Branches',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Cá nhân',
+            label: 'Profile',
           ),
         ],
       ),
@@ -304,74 +292,47 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Xóa dòng import này vì đã di chuyển lên trên
-  // import '../../orders/screens/return_exchange_screen.dart';
-
   Widget _buildFeatureItem(BuildContext context, IconData icon, String label) {
     return GestureDetector(
       onTap: () {
-        // Xử lý sự kiện nhấn vào các mục menu
         switch (label) {
-          case 'Tích điểm':  // Thay đổi lại thành 'Tích điểm'
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const PointsScreen()),  // Thay đổi lại thành PointsScreen
-            );
+          case 'Earn Points':
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PointsScreen()));
             break;
-          case 'Đổi thưởng':
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const RewardsScreen()),
-            );
+          case 'Redeem':
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RewardsScreen()));
             break;
-          case 'Đặt hàng':
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const OrderScreen()),
-            );
+          case 'Order':
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OrderScreen()));
             break;
-          case 'Thu đổi': // Thêm case mới cho chức năng "Thu đổi"
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const ReturnExchangeScreen()),
-            );
+          case 'Exchange':
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReturnExchangeScreen()));
             break;
-          case 'Liên hệ':
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const ContactScreen()),
-            );
+          case 'Contact':
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ContactScreen()));
             break;
-          case 'Bảo hành':
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const WarrantyScreen()),
-            );
+          case 'Warranty':
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WarrantyScreen()));
             break;
-          case 'Theo dõi':
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const TrackingScreen()),
-            );
+          case 'Tracking':
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TrackingScreen()));
             break;
-          case 'Hỗ trợ':
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const SupportCenterScreen()),
-            );
+          case 'Support':
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SupportCenterScreen()));
             break;
-          case 'Phiếu góp ý':
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const FeedbackScreen()),
-            );
+          case 'Feedback':
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FeedbackScreen()));
             break;
-          case 'Phiếu khảo sát':
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const SurveyScreen()),
-            );
+          case 'Survey':
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SurveyScreen()));
             break;
-          case 'Tin tức':
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const NewsScreen()),
-            );
+          case 'News':
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NewsScreen()));
             break;
           default:
-            // Hiển thị thông báo chức năng đang phát triển
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Chức năng đang được phát triển'),
+                content: Text('This feature is under development'),
                 duration: Duration(seconds: 2),
               ),
             );

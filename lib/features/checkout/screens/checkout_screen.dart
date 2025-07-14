@@ -8,7 +8,7 @@ import 'order_success_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({Key? key}) : super(key: key);
-  
+
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
@@ -22,11 +22,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   String? _note;
 
   void _showPaymentMethodModal() {
-    // Tạo một đối tượng OrderModel tạm thời để truyền vào modal
+    // Create a temporary OrderModel to pass into the modal
     final tempOrder = OrderModel(
       id: 'ORD${DateTime.now().millisecondsSinceEpoch}',
-      items: [], // Trong ứng dụng thực tế, lấy từ giỏ hàng
-      totalAmount: 500000, // Giả định tổng tiền
+      items: [], // In a real app, fetch from cart
+      totalAmount: 500000, // Example total
       shippingFee: 30000,
       deliveryMethod: _deliveryMethod,
       paymentMethod: _paymentMethod,
@@ -35,7 +35,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       recipientAddress: _recipientAddress,
       note: _note,
     );
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -49,7 +49,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             _paymentMethod = method;
           });
         },
-        order: tempOrder, // Truyền đơn hàng để hiển thị QR nếu chọn chuyển khoản
+        order: tempOrder, // Used for showing QR if bank transfer is selected
       ),
     );
   }
@@ -57,15 +57,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Chi tiết đơn hàng')),
+      appBar: AppBar(title: const Text('Order Details')),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Hình thức giao hàng
-              const Text('Hình thức giao hàng', 
+              // Delivery method
+              const Text(
+                'Delivery Method',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 8),
@@ -85,7 +86,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           children: const [
                             Icon(Icons.local_shipping),
                             SizedBox(height: 8),
-                            Text('Giao tận nơi'),
+                            Text('Home Delivery'),
                           ],
                         ),
                       ),
@@ -106,7 +107,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           children: const [
                             Icon(Icons.store),
                             SizedBox(height: 8),
-                            Text('Tự đến lấy'),
+                            Text('Self Pickup'),
                           ],
                         ),
                       ),
@@ -115,19 +116,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              
-              // Thông tin người nhận
+
+              // Recipient information
               if (_deliveryMethod == DeliveryMethod.delivery)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Thông tin người nhận hàng', 
+                    const Text(
+                      'Recipient Information',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     const SizedBox(height: 8),
                     TextField(
                       decoration: const InputDecoration(
-                        labelText: 'Họ tên',
+                        labelText: 'Full Name',
                         border: OutlineInputBorder(),
                       ),
                       onChanged: (v) => _recipientName = v,
@@ -135,7 +137,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     const SizedBox(height: 12),
                     TextField(
                       decoration: const InputDecoration(
-                        labelText: 'Số điện thoại',
+                        labelText: 'Phone Number',
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.phone,
@@ -144,7 +146,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     const SizedBox(height: 12),
                     TextField(
                       decoration: const InputDecoration(
-                        labelText: 'Địa chỉ',
+                        labelText: 'Address',
                         border: OutlineInputBorder(),
                       ),
                       maxLines: 2,
@@ -153,9 +155,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     const SizedBox(height: 24),
                   ],
                 ),
-              
-              // Phương thức thanh toán
-              const Text('Phương thức thanh toán', 
+
+              // Payment method
+              const Text(
+                'Payment Method',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 8),
@@ -181,8 +184,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           const SizedBox(width: 12),
                           Text(
                             _paymentMethod == PaymentMethod.cod
-                                ? 'Thanh toán khi nhận hàng (COD)'
-                                : 'Chuyển khoản ngân hàng',
+                                ? 'Cash on Delivery (COD)'
+                                : 'Bank Transfer',
                             style: const TextStyle(fontSize: 16),
                           ),
                         ],
@@ -193,36 +196,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              
-              // Ghi chú
-              const Text('Ghi chú', 
+
+              // Note
+              const Text(
+                'Note',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 8),
               TextField(
                 decoration: const InputDecoration(
-                  hintText: 'Nhập ghi chú cho đơn hàng (nếu có)',
+                  hintText: 'Add a note for your order (optional)',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
                 onChanged: (v) => _note = v,
               ),
               const SizedBox(height: 32),
-              
-              // Nút đặt hàng
+
+              // Place order button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Xử lý đặt hàng
-                    _placeOrder();
-                  },
+                  onPressed: _placeOrder,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: const Text(
-                    'Đặt hàng',
+                    'Place Order',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
@@ -235,11 +236,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _placeOrder() {
-    // Tạo đơn hàng và xử lý
+    // Create and submit order
     final order = OrderModel(
       id: 'ORD${DateTime.now().millisecondsSinceEpoch}',
-      items: [], // Trong ứng dụng thực tế, lấy từ giỏ hàng
-      totalAmount: 500000, // Giả định tổng tiền
+      items: [], // In a real app, fetch from cart
+      totalAmount: 500000, // Example total
       shippingFee: 30000,
       deliveryMethod: _deliveryMethod,
       paymentMethod: _paymentMethod,
@@ -248,9 +249,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       recipientAddress: _recipientAddress,
       note: _note,
     );
-    
-    // Nếu chọn chuyển khoản, hiển thị màn hình QR
+
     if (_paymentMethod == PaymentMethod.bankTransfer) {
+      // Navigate to QR code screen
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -258,13 +259,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             order: order,
             bankName: 'Vietcombank',
             accountNumber: '1234567890',
-            accountName: 'CÔNG TY TNHH HUY THANH',
+            accountName: 'HANNIE JEWELRY CO., LTD',
           ),
         ),
       );
     } else {
-      // Xử lý đơn hàng COD và chuyển đến màn hình thành công
-      // Thêm đơn hàng vào OrderService
+      // Process COD order and navigate to success screen
       final orderService = Provider.of<OrderService>(context, listen: false);
       orderService.addOrder(order).then((_) {
         Navigator.pushReplacement(

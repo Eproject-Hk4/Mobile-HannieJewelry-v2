@@ -6,8 +6,8 @@ import '../../../core/constants/app_styles.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../home/screens/home_screen.dart';
 import '../services/auth_service.dart';
-import 'phone_input_screen.dart'; // Thêm import này
-import 'register_screen.dart'; // Thêm import này
+import 'phone_input_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -98,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: _phoneController,
                 decoration: const InputDecoration(
-                  labelText: 'Số điện thoại',
+                  labelText: 'Phone number',
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.phone,
@@ -107,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: _passwordController,
                 decoration: const InputDecoration(
-                  labelText: 'Mật khẩu',
+                  labelText: 'Password',
                   border: OutlineInputBorder(),
                 ),
                 obscureText: true,
@@ -117,13 +117,13 @@ class _LoginScreenState extends State<LoginScreen> {
               _isLoading
                   ? const CircularProgressIndicator()
                   : CustomButton(
-                      text: AppStrings.loginWithPhone,
-                      onPressed: _login,
-                    ),
+                text: AppStrings.loginWithPhone,
+                onPressed: _login,
+              ),
               const SizedBox(height: 16),
               // OTP Login button
               CustomButton(
-                text: 'Đăng nhập bằng OTP',
+                text: AppStrings.loginWithOTP,
                 onPressed: _navigateToOtpLogin,
                 isPrimary: false,
               ),
@@ -133,13 +133,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Chưa có tài khoản? ',
+                    'Don’t have an account? ',
                     style: AppStyles.bodyTextSmall,
                   ),
                   TextButton(
                     onPressed: _navigateToRegister,
                     child: Text(
-                      'Đăng ký ngay',
+                      'Register now',
                       style: AppStyles.bodyTextSmall.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
@@ -160,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 },
                 child: Text(
-                  'Bỏ qua',
+                  AppStrings.skip,
                   style: AppStyles.bodyText.copyWith(
                     color: AppColors.textLight,
                   ),

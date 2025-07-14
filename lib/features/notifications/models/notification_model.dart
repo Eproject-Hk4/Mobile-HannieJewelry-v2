@@ -46,6 +46,45 @@ class NotificationModel {
     );
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'message': message,
+      'timestamp': timestamp.toIso8601String(),
+      'is_read': isRead,
+      'type': type.toString().split('.').last,
+      'image_url': imageUrl,
+    };
+  }
+
+  factory NotificationModel.fromMap(Map<String, dynamic> map) {
+    return NotificationModel(
+      id: map['id'],
+      title: map['title'],
+      message: map['message'],
+      timestamp: DateTime.parse(map['timestamp']),
+      isRead: map['is_read'] ?? false,
+      type: _getTypeFromString(map['type']),
+      imageUrl: map['image_url'],
+    );
+  }
+
+  static NotificationType _getTypeFromString(String type) {
+    switch (type) {
+      case 'promotion':
+        return NotificationType.promotion;
+      case 'order':
+        return NotificationType.order;
+      case 'system':
+        return NotificationType.system;
+      case 'news':
+        return NotificationType.news;
+      default:
+        return NotificationType.system;
+    }
+  }
+
   IconData getIcon() {
     switch (type) {
       case NotificationType.promotion:

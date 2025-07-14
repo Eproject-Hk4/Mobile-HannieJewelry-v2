@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   # Thêm dòng này
+  http: ^0.13.5
   provider: ^6.1.5
   qr_flutter: ^4.1.0  # Thêm package này để tạo mã QR
   shared_preferences: ^2.2.2  # Thêm package này để sử dụng SharedPreferences

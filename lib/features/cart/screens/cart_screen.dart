@@ -6,7 +6,6 @@ import '../../checkout/screens/checkout_screen.dart';
 import '../models/cart_model.dart';
 import '../services/cart_service.dart';
 import '../../../core/widgets/custom_button.dart';
- // Thêm import này
 
 class CartScreen extends StatelessWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -19,7 +18,7 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Giỏ hàng của bạn'),
+        title: const Text('Your Cart'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -28,68 +27,67 @@ class CartScreen extends StatelessWidget {
       ),
       body: items.isEmpty
           ? const Center(
-              child: Text('Giỏ hàng của bạn đang trống'),
-            )
+        child: Text('Your cart is empty'),
+      )
           : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: items.length,
-                    itemBuilder: (ctx, i) => CartItemWidget(cartItem: items[i]),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 1,
-                        blurRadius: 5,
-                        offset: const Offset(0, -3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Tạm tính',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          Text(
-                            '${_formatCurrency(cartService.totalAmount)} đ',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      CustomButton(
-                        text: 'Mua ngay',
-                        onPressed: () {
-                          // Chuyển đến màn hình thanh toán
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const CheckoutScreen(),
-                            ),
-                          );
-                        },
-                        isPrimary: true,
-                        isFullWidth: true,
-                      ),
-                    ],
-                  ),
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (ctx, i) => CartItemWidget(cartItem: items[i]),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 5,
+                  offset: const Offset(0, -3),
                 ),
               ],
             ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Subtotal',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      '${_formatCurrency(cartService.totalAmount)} đ',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                CustomButton(
+                  text: 'Checkout Now',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CheckoutScreen(),
+                      ),
+                    );
+                  },
+                  isPrimary: true,
+                  isFullWidth: true,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -121,7 +119,7 @@ class CartItemWidget extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
-            // Hình ảnh sản phẩm
+            // Product image
             Container(
               width: 80,
               height: 80,
@@ -134,7 +132,7 @@ class CartItemWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            // Thông tin sản phẩm
+            // Product information
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +154,7 @@ class CartItemWidget extends StatelessWidget {
                 ],
               ),
             ),
-            // Số lượng
+            // Quantity controls
             Row(
               children: [
                 IconButton(
@@ -177,7 +175,7 @@ class CartItemWidget extends StatelessWidget {
                 ),
               ],
             ),
-            // Nút xóa
+            // Delete button
             IconButton(
               icon: const Icon(Icons.delete_outline, color: Colors.red),
               onPressed: () {

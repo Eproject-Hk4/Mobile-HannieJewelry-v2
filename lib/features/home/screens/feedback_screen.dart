@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_styles.dart';
 
-
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({Key? key}) : super(key: key);
 
@@ -19,7 +18,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Phiếu góp ý'),
+        title: const Text('Feedback Form'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -33,7 +32,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Đánh giá dịch vụ',
+                'Rate our service',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
@@ -41,7 +40,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'Mức độ hài lòng của bạn',
+                      'Your satisfaction level',
                       style: AppStyles.bodyText,
                     ),
                     const SizedBox(height: 8),
@@ -74,11 +73,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Không hài lòng',
+                          'Not satisfied',
                           style: AppStyles.bodyTextSmall.copyWith(color: Colors.grey),
                         ),
                         Text(
-                          'Rất hài lòng',
+                          'Very satisfied',
                           style: AppStyles.bodyTextSmall.copyWith(color: Colors.grey),
                         ),
                       ],
@@ -88,13 +87,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Thông tin của bạn',
+                'Your information',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
               TextField(
                 decoration: InputDecoration(
-                  hintText: 'Họ và tên',
+                  hintText: 'Full Name',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -112,7 +111,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               const SizedBox(height: 16),
               TextField(
                 decoration: InputDecoration(
-                  hintText: 'Số điện thoại',
+                  hintText: 'Phone Number',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -120,14 +119,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Nội dung góp ý',
+                'Feedback content',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
               TextField(
                 maxLines: 5,
                 decoration: InputDecoration(
-                  hintText: 'Nhập nội dung góp ý của bạn',
+                  hintText: 'Enter your feedback here',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -140,7 +139,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Cảm ơn bạn đã gửi góp ý'),
+                        content: Text('Thank you for your feedback!'),
                         duration: Duration(seconds: 2),
                       ),
                     );
@@ -153,7 +152,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text('Gửi góp ý'),
+                  child: const Text('Submit Feedback'),
                 ),
               ),
             ],

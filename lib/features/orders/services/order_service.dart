@@ -1,32 +1,42 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../features/checkout/models/order_model.dart';
 import '../../../features/auth/services/auth_service.dart';
+import '../../../core/services/api_service.dart';
 
 class OrderService extends ChangeNotifier {
   final AuthService _authService;
+  final ApiService _apiService = ApiService();
   List<OrderModel> _orders = [];
 
   OrderService(this._authService);
 
   List<OrderModel> get orders => _orders;
 
-  // Lấy danh sách đơn hàng của người dùng hiện tại
+  // Get the list of orders for the current user
   Future<void> fetchOrders() async {
     if (!_authService.isAuthenticated) return;
 
-    // Trong thực tế, bạn sẽ gọi API để lấy danh sách đơn hàng
-    // Đây là mô phỏng lấy dữ liệu thành công
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      final response = await _apiService.get('orders');
+      final List<dynamic> ordersData = response['orders'];
+      _orders = ordersData.map((order) => OrderModel.fromMap(order)).toList();
+      notifyListeners();
+    } catch (e) {
+      print('Error when getting order list: $e');
+      // Fallback with sample data if API fails
+      _initializeSampleOrders();
+    }
+  }
 
-    // Tạo dữ liệu mẫu
+  // Initialize sample data (only used when API fails)
+  void _initializeSampleOrders() {
     _orders = [
       OrderModel(
         id: 'ORD123456',
         items: [
           OrderItem(
             productId: 'P001',
-            name: 'Lắc tay vàng 18K',
+            name: '18K Gold Bracelet',
             imageUrl: 'assets/images/placeholder.png',
             price: 2500000,
             quantity: 1,
@@ -36,61 +46,48 @@ class OrderService extends ChangeNotifier {
         shippingFee: 30000,
         deliveryMethod: DeliveryMethod.delivery,
         paymentMethod: PaymentMethod.cod,
-        recipientName: 'Nguyễn Văn A',
+        recipientName: 'John Doe',
         recipientPhone: '0901234567',
-        recipientAddress: '123 Đường ABC, Quận 1, TP.HCM',
+        recipientAddress: '123 ABC Street, District 1, HCMC',
       ),
-      OrderModel(
-        id: 'ORD789012',
-        items: [
-          OrderItem(
-            productId: 'P002',
-            name: 'Nhẫn kim cương',
-            imageUrl: 'assets/images/placeholder.png',
-            price: 5000000,
-            quantity: 1,
-          ),
-          OrderItem(
-            productId: 'P003',
-            name: 'Bông tai bạc',
-            imageUrl: 'assets/images/placeholder.png',
-            price: 800000,
-            quantity: 2,
-          ),
-        ],
-        totalAmount: 6600000,
-        shippingFee: 0,
-        deliveryMethod: DeliveryMethod.pickup,
-        paymentMethod: PaymentMethod.bankTransfer,
-        recipientName: 'Nguyễn Văn A',
-        recipientPhone: '0901234567',
-        recipientAddress: '',
-        pickupLocation: 'Chi nhánh Quận 1',
-      ),
+      // Add other sample orders if needed
     ];
 
     notifyListeners();
   }
 
-  // Thêm đơn hàng mới
+  // Add new order
   Future<bool> addOrder(OrderModel order) async {
     if (!_authService.isAuthenticated) return false;
 
-    // Trong thực tế, bạn sẽ gọi API để tạo đơn hàng
-    // Đây là mô phỏng tạo đơn hàng thành công
-    await Future.delayed(const Duration(seconds: 1));
-
-    _orders.add(order);
-    notifyListeners();
-    return true;
+    try {
+      final response = await _apiService.post('orders', order.toMap());
+      if (response['success']) {
+        final newOrder = OrderModel.fromMap(response['order']);
+        _orders.add(newOrder);
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error when creating order: $e');
+      return false;
+    }
   }
 
-  // Lấy chi tiết đơn hàng theo ID
-  OrderModel? getOrderById(String orderId) {
+  // Get order details by ID
+  Future<OrderModel?> getOrderById(String orderId) async {
     try {
-      return _orders.firstWhere((order) => order.id == orderId);
+      final response = await _apiService.get('orders/$orderId');
+      return OrderModel.fromMap(response['order']);
     } catch (e) {
-      return null;
+      print('Error when getting order details: $e');
+      // Fallback to search in local data if API fails
+      try {
+        return _orders.firstWhere((order) => order.id == orderId);
+      } catch (e) {
+        return null;
+      }
     }
   }
 }

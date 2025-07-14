@@ -31,7 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _register() async {
-    // Kiểm tra dữ liệu nhập
+    // Validate input
     final name = _nameController.text.trim();
     final phone = _phoneController.text.trim();
     final password = _passwordController.text;
@@ -39,14 +39,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (name.isEmpty || phone.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng điền đầy đủ thông tin')),
+        const SnackBar(content: Text('Please fill in all required fields')),
       );
       return;
     }
 
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mật khẩu xác nhận không khớp')),
+        const SnackBar(content: Text('Passwords do not match')),
       );
       return;
     }
@@ -68,7 +68,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đăng ký thành công!')),
+        const SnackBar(content: Text('Registration successful!')),
       );
       Navigator.pushReplacement(
         context,
@@ -76,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đăng ký thất bại. Vui lòng thử lại.')),
+        const SnackBar(content: Text('Registration failed. Please try again.')),
       );
     }
   }
@@ -90,7 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         title: const Text(
-          'Đăng ký tài khoản',
+          'Register Account',
           style: TextStyle(color: AppColors.textPrimary),
         ),
       ),
@@ -102,19 +102,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               const SizedBox(height: 24),
               Text(
-                'Tạo tài khoản mới',
+                'Create a New Account',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 8),
               Text(
-                'Vui lòng điền thông tin để đăng ký tài khoản',
+                'Please fill in the information to register an account',
                 style: AppStyles.bodyTextSmall,
               ),
               const SizedBox(height: 32),
               TextField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  labelText: 'Họ và tên',
+                  labelText: 'Full Name',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.person),
                 ),
@@ -123,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextField(
                 controller: _phoneController,
                 decoration: const InputDecoration(
-                  labelText: 'Số điện thoại',
+                  labelText: 'Phone Number',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.phone),
                 ),
@@ -133,7 +133,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextField(
                 controller: _passwordController,
                 decoration: const InputDecoration(
-                  labelText: 'Mật khẩu',
+                  labelText: 'Password',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.lock),
                 ),
@@ -143,7 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextField(
                 controller: _confirmPasswordController,
                 decoration: const InputDecoration(
-                  labelText: 'Xác nhận mật khẩu',
+                  labelText: 'Confirm Password',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.lock_outline),
                 ),
@@ -153,9 +153,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : CustomButton(
-                      text: 'Đăng ký',
-                      onPressed: _register,
-                    ),
+                text: 'Register',
+                onPressed: _register,
+              ),
               const SizedBox(height: 24),
             ],
           ),

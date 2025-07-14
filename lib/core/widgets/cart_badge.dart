@@ -12,7 +12,7 @@ class CartBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
-    
+
     return Consumer<CartService>(
       builder: (context, cartService, child) {
         return Stack(
@@ -21,7 +21,7 @@ class CartBadge extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.shopping_cart),
               onPressed: () {
-                // Kiểm tra đăng nhập trước khi mở giỏ hàng
+                // Check login before opening cart
                 if (authService.isAuthenticated) {
                   Navigator.push(
                     context,
@@ -64,17 +64,17 @@ class CartBadge extends StatelessWidget {
       },
     );
   }
-  
+
   void _showLoginRequiredDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Yêu cầu đăng nhập'),
-        content: const Text('Bạn cần đăng nhập để sử dụng tính năng này.'),
+        title: const Text('Login Required'),
+        content: const Text('You need to log in to use this feature.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Hủy'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -86,7 +86,7 @@ class CartBadge extends StatelessWidget {
                 ),
               );
             },
-            child: const Text('Đăng nhập'),
+            child: const Text('Log In'),
           ),
         ],
       ),

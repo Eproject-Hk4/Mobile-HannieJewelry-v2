@@ -28,8 +28,8 @@ class CartItem {
       id: map['id'],
       name: map['name'],
       price: map['price'],
-      image: map['image'],
-      quantity: map['quantity'],
+      image: map['image'] ?? 'assets/images/placeholder.png',
+      quantity: map['quantity'] ?? 1,
     );
   }
 }

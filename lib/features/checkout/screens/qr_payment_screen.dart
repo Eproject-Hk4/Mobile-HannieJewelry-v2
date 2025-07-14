@@ -32,950 +32,161 @@ class _QRPaymentScreenState extends State<QRPaymentScreen> {
 
   String _generateVietQRContent() {
     // Format: bankCode|accountNumber|amount|content
-    // Đây là định dạng đơn giản, thực tế VietQR có thể phức tạp hơn
+    // This is a simplified format. Actual VietQR format might differ
     final formattedAmount = widget.order.totalAmount.toStringAsFixed(0);
-    return "${widget.bankName}|${widget.accountNumber}|$formattedAmount|Thanh toan don hang ${widget.order.id}";
+    return "${widget.bankName}|${widget.accountNumber}|$formattedAmount|Payment for order ${widget.order.id}";
   }
 
   Future<void> _downloadQRCode() async {
-    // Thực hiện tải mã QR (trong ứng dụng thực tế sẽ cần plugin để lưu hình ảnh)
+    // Simulate download (actual saving will require plugins like path_provider, image_gallery_saver)
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Đã tải mã QR thành công')),
+      const SnackBar(content: Text('QR code downloaded successfully')),
     );
   }
 
   void _copyToClipboard(String text) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Đã sao chép vào bộ nhớ tạm')),
+      const SnackBar(content: Text('Copied to clipboard')),
     );
   }
 
   @override
-  // Thêm nút xác nhận đã thanh toán
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Thanh toán QR'),
+        title: const Text('QR Payment'),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Thông tin đơn hàng
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildInfoRow('Mã đơn hàng', widget.order.id),
-                    const Divider(),
-                    _buildInfoRow(
-                      'Tổng tiền',
-                      '${widget.order.totalAmount.toStringAsFixed(0)} đ',
-                    ),
-                  ],
-                ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Order information
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: _boxDecoration(),
+              child: Column(
+                children: [
+                  _buildInfoRow('Order ID', widget.order.id),
+                  const Divider(),
+                  _buildInfoRow(
+                    'Total Amount',
+                    '${widget.order.totalAmount.toStringAsFixed(0)} đ',
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
-              
-              // QR Code
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
+            ),
+            const SizedBox(height: 24),
+
+            // QR Code
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: _boxDecoration(),
+              child: Column(
+                children: [
+                  const Text(
+                    'Scan to Pay',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  QrImageView(
+                    data: qrContent,
+                    version: QrVersions.auto,
+                    size: 200.0,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: _downloadQRCode,
+                    icon: const Icon(Icons.download),
+                    label: const Text('Download QR Code'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
                     ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Quét mã để thanh toán',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    QrImageView(
-                      data: qrContent,
-                      version: QrVersions.auto,
-                      size: 200.0,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      onPressed: _downloadQRCode,
-                      icon: const Icon(Icons.download),
-                      label: const Text('Tải mã QR'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
-              
-              // Thông tin chuyển khoản
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Thông tin chuyển khoản',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildCopyableInfoRow('Ngân hàng', widget.bankName),
-                    const Divider(),
-                    _buildCopyableInfoRow('Số tài khoản', widget.accountNumber),
-                    const Divider(),
-                    _buildCopyableInfoRow('Tên tài khoản', widget.accountName),
-                    const Divider(),
-                    _buildCopyableInfoRow(
-                      'Số tiền',
-                      '${widget.order.totalAmount.toStringAsFixed(0)} đ',
-                    ),
-                    const Divider(),
-                    _buildCopyableInfoRow(
-                      'Nội dung CK',
-                      'Thanh toan don hang ${widget.order.id}',
-                    ),
-                  ],
-                ),
+            ),
+            const SizedBox(height: 24),
+
+            // Bank transfer info
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: _boxDecoration(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Bank Transfer Details',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildCopyableInfoRow('Bank', widget.bankName),
+                  const Divider(),
+                  _buildCopyableInfoRow('Account Number', widget.accountNumber),
+                  const Divider(),
+                  _buildCopyableInfoRow('Account Name', widget.accountName),
+                  const Divider(),
+                  _buildCopyableInfoRow(
+                    'Amount',
+                    '${widget.order.totalAmount.toStringAsFixed(0)} đ',
+                  ),
+                  const Divider(),
+                  _buildCopyableInfoRow(
+                    'Transfer Note',
+                    'Payment for order ${widget.order.id}',
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
-              
-              // Lưu ý
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber.shade200),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Lưu ý:',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      '- Vui lòng thanh toán trong vòng 24h kể từ khi đặt hàng\n'
-                      '- Đơn hàng sẽ được xử lý sau khi chúng tôi nhận được thanh toán\n'
-                      '- Nếu cần hỗ trợ, vui lòng liên hệ hotline: 0345 807 906',
-                    ),
-                  ],
-                ),
+            ),
+            const SizedBox(height: 24),
+
+            // Notes
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.amber.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber.shade200),
               ),
-            ],
-          ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Note:',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    '- Please complete the payment within 24 hours after placing the order.\n'
+                        '- Your order will be processed after we receive the payment.\n'
+                        '- For support, contact hotline: 0345 807 906',
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Thanh toán QR'),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Thông tin đơn hàng
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildInfoRow('Mã đơn hàng', widget.order.id),
-                    const Divider(),
-                    _buildInfoRow(
-                      'Tổng tiền',
-                      '${widget.order.totalAmount.toStringAsFixed(0)} đ',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // QR Code
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Quét mã để thanh toán',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    QrImageView(
-                      data: qrContent,
-                      version: QrVersions.auto,
-                      size: 200.0,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      onPressed: _downloadQRCode,
-                      icon: const Icon(Icons.download),
-                      label: const Text('Tải mã QR'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Thông tin chuyển khoản
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Thông tin chuyển khoản',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildCopyableInfoRow('Ngân hàng', widget.bankName),
-                    const Divider(),
-                    _buildCopyableInfoRow('Số tài khoản', widget.accountNumber),
-                    const Divider(),
-                    _buildCopyableInfoRow('Tên tài khoản', widget.accountName),
-                    const Divider(),
-                    _buildCopyableInfoRow(
-                      'Số tiền',
-                      '${widget.order.totalAmount.toStringAsFixed(0)} đ',
-                    ),
-                    const Divider(),
-                    _buildCopyableInfoRow(
-                      'Nội dung CK',
-                      'Thanh toan don hang ${widget.order.id}',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Lưu ý
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber.shade200),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Lưu ý:',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      '- Vui lòng thanh toán trong vòng 24h kể từ khi đặt hàng\n'
-                      '- Đơn hàng sẽ được xử lý sau khi chúng tôi nhận được thanh toán\n'
-                      '- Nếu cần hỗ trợ, vui lòng liên hệ hotline: 0345 807 906',
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+  }
+
+  BoxDecoration _boxDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(8),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.2),
+          spreadRadius: 1,
+          blurRadius: 5,
         ),
-      ),
-    );
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Thanh toán QR'),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Thông tin đơn hàng
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildInfoRow('Mã đơn hàng', widget.order.id),
-                    const Divider(),
-                    _buildInfoRow(
-                      'Tổng tiền',
-                      '${widget.order.totalAmount.toStringAsFixed(0)} đ',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // QR Code
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Quét mã để thanh toán',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    QrImageView(
-                      data: qrContent,
-                      version: QrVersions.auto,
-                      size: 200.0,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      onPressed: _downloadQRCode,
-                      icon: const Icon(Icons.download),
-                      label: const Text('Tải mã QR'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Thông tin chuyển khoản
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Thông tin chuyển khoản',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildCopyableInfoRow('Ngân hàng', widget.bankName),
-                    const Divider(),
-                    _buildCopyableInfoRow('Số tài khoản', widget.accountNumber),
-                    const Divider(),
-                    _buildCopyableInfoRow('Tên tài khoản', widget.accountName),
-                    const Divider(),
-                    _buildCopyableInfoRow(
-                      'Số tiền',
-                      '${widget.order.totalAmount.toStringAsFixed(0)} đ',
-                    ),
-                    const Divider(),
-                    _buildCopyableInfoRow(
-                      'Nội dung CK',
-                      'Thanh toan don hang ${widget.order.id}',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Lưu ý
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber.shade200),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Lưu ý:',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      '- Vui lòng thanh toán trong vòng 24h kể từ khi đặt hàng\n'
-                      '- Đơn hàng sẽ được xử lý sau khi chúng tôi nhận được thanh toán\n'
-                      '- Nếu cần hỗ trợ, vui lòng liên hệ hotline: 0345 807 906',
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Thanh toán QR'),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Thông tin đơn hàng
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildInfoRow('Mã đơn hàng', widget.order.id),
-                    const Divider(),
-                    _buildInfoRow(
-                      'Tổng tiền',
-                      '${widget.order.totalAmount.toStringAsFixed(0)} đ',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // QR Code
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Quét mã để thanh toán',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    QrImageView(
-                      data: qrContent,
-                      version: QrVersions.auto,
-                      size: 200.0,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      onPressed: _downloadQRCode,
-                      icon: const Icon(Icons.download),
-                      label: const Text('Tải mã QR'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Thông tin chuyển khoản
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Thông tin chuyển khoản',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildCopyableInfoRow('Ngân hàng', widget.bankName),
-                    const Divider(),
-                    _buildCopyableInfoRow('Số tài khoản', widget.accountNumber),
-                    const Divider(),
-                    _buildCopyableInfoRow('Tên tài khoản', widget.accountName),
-                    const Divider(),
-                    _buildCopyableInfoRow(
-                      'Số tiền',
-                      '${widget.order.totalAmount.toStringAsFixed(0)} đ',
-                    ),
-                    const Divider(),
-                    _buildCopyableInfoRow(
-                      'Nội dung CK',
-                      'Thanh toan don hang ${widget.order.id}',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Lưu ý
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber.shade200),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Lưu ý:',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      '- Vui lòng thanh toán trong vòng 24h kể từ khi đặt hàng\n'
-                      '- Đơn hàng sẽ được xử lý sau khi chúng tôi nhận được thanh toán\n'
-                      '- Nếu cần hỗ trợ, vui lòng liên hệ hotline: 0345 807 906',
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Thanh toán QR'),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Thông tin đơn hàng
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildInfoRow('Mã đơn hàng', widget.order.id),
-                    const Divider(),
-                    _buildInfoRow(
-                      'Tổng tiền',
-                      '${widget.order.totalAmount.toStringAsFixed(0)} đ',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // QR Code
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Quét mã để thanh toán',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    QrImageView(
-                      data: qrContent,
-                      version: QrVersions.auto,
-                      size: 200.0,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      onPressed: _downloadQRCode,
-                      icon: const Icon(Icons.download),
-                      label: const Text('Tải mã QR'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Thông tin chuyển khoản
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Thông tin chuyển khoản',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildCopyableInfoRow('Ngân hàng', widget.bankName),
-                    const Divider(),
-                    _buildCopyableInfoRow('Số tài khoản', widget.accountNumber),
-                    const Divider(),
-                    _buildCopyableInfoRow('Tên tài khoản', widget.accountName),
-                    const Divider(),
-                    _buildCopyableInfoRow(
-                      'Số tiền',
-                      '${widget.order.totalAmount.toStringAsFixed(0)} đ',
-                    ),
-                    const Divider(),
-                    _buildCopyableInfoRow(
-                      'Nội dung CK',
-                      'Thanh toan don hang ${widget.order.id}',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Lưu ý
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber.shade200),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Lưu ý:',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      '- Vui lòng thanh toán trong vòng 24h kể từ khi đặt hàng\n'
-                      '- Đơn hàng sẽ được xử lý sau khi chúng tôi nhận được thanh toán\n'
-                      '- Nếu cần hỗ trợ, vui lòng liên hệ hotline: 0345 807 906',
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Thanh toán QR'),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Thông tin đơn hàng
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildInfoRow('Mã đơn hàng', widget.order.id),
-                    const Divider(),
-                    _buildInfoRow(
-                      'Tổng tiền',
-                      '${widget.order.totalAmount.toStringAsFixed(0)} đ',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // QR Code
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Quét mã để thanh toán',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    QrImageView(
-                      data: qrContent,
-                      version: QrVersions.auto,
-                      size: 200.0,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      onPressed: _downloadQRCode,
-                      icon: const Icon(Icons.download),
-                      label: const Text('Tải mã QR'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Thông tin chuyển khoản
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Thông tin chuyển khoản',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildCopyableInfoRow('Ngân hàng', widget.bankName),
-                    const Divider(),
-                    _buildCopyableInfoRow('Số tài khoản', widget.accountNumber),
-                    const Divider(),
-                    _buildCopyableInfoRow('Tên tài khoản', widget.accountName),
-                    const Divider(),
-                    _buildCopyableInfoRow(
-                      'Số tiền',
-                      '${widget.order.totalAmount.toStringAsFixed(0)} đ',
-                    ),
-                    const Divider(),
-                    _buildCopyableInfoRow(
-                      'Nội dung CK',
-                      'Thanh toan don hang ${widget.order.id}',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Lưu ý
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber.shade200),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Lưu ý:',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      '- Vui lòng thanh toán trong vòng 24h kể từ khi đặt hàng\n'
-                      '- Đơn hàng sẽ được xử lý sau khi chúng tôi nhận được thanh toán\n'
-                      '- Nếu cần hỗ trợ, vui lòng liên hệ hotline: 0345 807 906',
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      ],
     );
   }
 
@@ -986,10 +197,7 @@ class _QRPaymentScreenState extends State<QRPaymentScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(color: Colors.grey)),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -1004,10 +212,7 @@ class _QRPaymentScreenState extends State<QRPaymentScreen> {
           Text(label, style: const TextStyle(color: Colors.grey)),
           Row(
             children: [
-              Text(
-                value,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+              Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
               IconButton(
                 icon: const Icon(Icons.copy, size: 16),
                 onPressed: () => _copyToClipboard(value),

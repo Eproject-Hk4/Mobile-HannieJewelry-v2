@@ -43,7 +43,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     final otp = _getOtpCode();
     if (otp.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập đủ 6 chữ số OTP')),
+        const SnackBar(content: Text('Please enter all 6 OTP digits')),
       );
       return;
     }
@@ -67,7 +67,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       );
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mã OTP không hợp lệ. Vui lòng thử lại.')),
+        const SnackBar(content: Text('Invalid OTP. Please try again.')),
       );
     }
   }
@@ -98,12 +98,12 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
             children: [
               const SizedBox(height: 24),
               Text(
-                'Xác thực OTP',
+                'OTP Verification',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 8),
               Text(
-                'Nhập mã xác thực đã được gửi đến $phoneNumber',
+                'Enter the verification code sent to $phoneNumber',
                 style: AppStyles.bodyTextSmall,
               ),
               const SizedBox(height: 32),
@@ -132,25 +132,24 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : CustomButton(
-                      text: 'Xác nhận',
+                      text: 'Confirm',
                       onPressed: _verifyOTP,
                     ),
               const SizedBox(height: 16),
               Center(
                 child: TextButton(
                   onPressed: () {
-                    // Gửi lại OTP
                     if (phoneNumber.isNotEmpty) {
                       authService.sendOTP(phoneNumber);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Mã OTP mới đã được gửi'),
+                          content: Text('New OTP has been sent'),
                         ),
                       );
                     }
                   },
                   child: Text(
-                    'Gửi lại mã',
+                    'Resend code',
                     style: AppStyles.bodyText.copyWith(
                       color: AppColors.primary,
                     ),

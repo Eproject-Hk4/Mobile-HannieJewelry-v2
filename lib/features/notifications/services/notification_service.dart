@@ -1,16 +1,33 @@
 import 'package:flutter/material.dart';
 import '../models/notification_model.dart';
+import '../../../core/services/api_service.dart';
 
 class NotificationService extends ChangeNotifier {
+  final ApiService _apiService = ApiService();
   List<NotificationModel> _notifications = [];
 
   NotificationService() {
-    _initializeNotifications();
+    fetchNotifications();
   }
 
   List<NotificationModel> get notifications => _notifications;
 
   int get unreadCount => _notifications.where((notification) => !notification.isRead).length;
+
+  Future<void> fetchNotifications() async {
+    try {
+      final response = await _apiService.get('notifications');
+      final List<dynamic> notificationsData = response['notifications'];
+      _notifications = notificationsData
+          .map((notification) => NotificationModel.fromMap(notification))
+          .toList();
+      notifyListeners();
+    } catch (e) {
+      print('Lỗi khi lấy thông báo: $e');
+      // Fallback với dữ liệu mẫu nếu API lỗi
+      _initializeNotifications();
+    }
+  }
 
   void _initializeNotifications() {
     // Dữ liệu mẫu
@@ -23,63 +40,85 @@ class NotificationService extends ChangeNotifier {
         type: NotificationType.promotion,
         imageUrl: 'assets/images/placeholder.png',
       ),
-      NotificationModel(
-        id: '2',
-        title: 'Đơn hàng #HD123456 đã được xác nhận',
-        message: 'Đơn hàng của bạn đã được xác nhận và đang được chuẩn bị',
-        timestamp: DateTime.now().subtract(const Duration(days: 1)),
-        type: NotificationType.order,
-      ),
-      NotificationModel(
-        id: '3',
-        title: 'Bộ sưu tập mới',
-        message: 'Bộ sưu tập Hannie Jewelry mùa hè 2023 đã ra mắt',
-        timestamp: DateTime.now().subtract(const Duration(days: 3)),
-        type: NotificationType.news,
-        imageUrl: 'assets/images/placeholder.png',
-      ),
-      NotificationModel(
-        id: '4',
-        title: 'Cập nhật ứng dụng',
-        message: 'Phiên bản mới của ứng dụng đã sẵn sàng để cập nhật',
-        timestamp: DateTime.now().subtract(const Duration(days: 5)),
-        type: NotificationType.system,
-      ),
+      // Thêm các thông báo mẫu khác nếu cần
     ];
   }
 
-  void markAsRead(String id, {Function? onSuccess}) {
-    final index = _notifications.indexWhere((notification) => notification.id == id);
-    if (index != -1) {
-      _notifications[index] = _notifications[index].copyWith(isRead: true);
-      notifyListeners();
-      if (onSuccess != null) {
-        onSuccess();
+  Future<void> markAsRead(String id, {Function? onSuccess}) async {
+    try {
+      final response = await _apiService.put('notifications/$id/read', {});
+      if (response['success']) {
+        final index = _notifications.indexWhere((notification) => notification.id == id);
+        if (index != -1) {
+          _notifications[index] = _notifications[index].copyWith(isRead: true);
+          notifyListeners();
+          if (onSuccess != null) {
+            onSuccess();
+          }
+        }
+      }
+    } catch (e) {
+      print('Lỗi khi đánh dấu đã đọc: $e');
+      // Fallback xử lý offline nếu API lỗi
+      final index = _notifications.indexWhere((notification) => notification.id == id);
+      if (index != -1) {
+        _notifications[index] = _notifications[index].copyWith(isRead: true);
+        notifyListeners();
+        if (onSuccess != null) {
+          onSuccess();
+        }
       }
     }
   }
 
-  void markAllAsRead() {
-    _notifications = _notifications.map((notification) => 
-      notification.copyWith(isRead: true)).toList();
-    notifyListeners();
+  Future<void> markAllAsRead() async {
+    try {
+      final response = await _apiService.put('notifications/read-all', {});
+      if (response['success']) {
+        _notifications = _notifications.map((notification) => 
+          notification.copyWith(isRead: true)).toList();
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Lỗi khi đánh dấu tất cả đã đọc: $e');
+      // Fallback xử lý offline nếu API lỗi
+      _notifications = _notifications.map((notification) => 
+        notification.copyWith(isRead: true)).toList();
+      notifyListeners();
+    }
   }
 
-  void deleteNotification(String id) {
-    _notifications.removeWhere((notification) => notification.id == id);
-    notifyListeners();
+  Future<void> deleteNotification(String id) async {
+    try {
+      final response = await _apiService.delete('notifications/$id');
+      if (response['success']) {
+        _notifications.removeWhere((notification) => notification.id == id);
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Lỗi khi xóa thông báo: $e');
+      // Fallback xử lý offline nếu API lỗi
+      _notifications.removeWhere((notification) => notification.id == id);
+      notifyListeners();
+    }
   }
 
-  void clearAll() {
-    _notifications = [];
-    notifyListeners();
+  Future<void> clearAll() async {
+    try {
+      final response = await _apiService.delete('notifications/clear-all');
+      if (response['success']) {
+        _notifications = [];
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Lỗi khi xóa tất cả thông báo: $e');
+      // Fallback xử lý offline nếu API lỗi
+      _notifications = [];
+      notifyListeners();
+    }
   }
 
   Future<void> refreshNotifications() async {
-    // Trong ứng dụng thực tế, bạn sẽ gọi API để lấy thông báo mới
-    // Ở đây chúng ta giả lập bằng cách đợi một chút và khởi tạo lại danh sách
-    await Future.delayed(const Duration(milliseconds: 800));
-    _initializeNotifications();
-    notifyListeners();
+    await fetchNotifications();
   }
 }

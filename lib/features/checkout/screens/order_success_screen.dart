@@ -42,7 +42,7 @@ class OrderSuccessScreen extends StatelessWidget {
               const SizedBox(height: 24),
               // Success message
               const Text(
-                'Đặt hàng thành công!',
+                'Order Placed Successfully!',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -50,7 +50,7 @@ class OrderSuccessScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Cảm ơn bạn đã đặt hàng. Đơn hàng của bạn đang được xử lý.',
+                'Thank you for your order. Your order is being processed.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -68,22 +68,22 @@ class OrderSuccessScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildInfoRow('Mã đơn hàng', '#${order.id}'),
+                    _buildInfoRow('Order ID', '#${order.id}'),
                     const Divider(),
                     _buildInfoRow(
-                      'Tổng tiền',
+                      'Total Amount',
                       '${_formatCurrency(order.totalAmount)} đ',
-                      valueStyle: TextStyle(
+                      valueStyle: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
                       ),
                     ),
                     const Divider(),
                     _buildInfoRow(
-                      'Phương thức thanh toán',
+                      'Payment Method',
                       order.paymentMethod == PaymentMethod.cod
-                          ? 'Thanh toán khi nhận hàng (COD)'
-                          : 'Chuyển khoản ngân hàng',
+                          ? 'Cash on Delivery (COD)'
+                          : 'Bank Transfer',
                     ),
                   ],
                 ),
@@ -107,7 +107,7 @@ class OrderSuccessScreen extends StatelessWidget {
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: const Text('Xem chi tiết đơn hàng'),
+                  child: const Text('View Order Details'),
                 ),
               ),
               const SizedBox(height: 16),
@@ -116,18 +116,18 @@ class OrderSuccessScreen extends StatelessWidget {
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () {
-                    // Quay về trang chủ
+                    // Navigate to home
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(builder: (context) => const HomeScreen()),
-                      (route) => false,
+                          (route) => false,
                     );
                   },
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: AppColors.primary),
+                    side: const BorderSide(color: AppColors.primary),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: const Text('Tiếp tục mua sắm'),
+                  child: const Text('Continue Shopping'),
                 ),
               ),
             ],

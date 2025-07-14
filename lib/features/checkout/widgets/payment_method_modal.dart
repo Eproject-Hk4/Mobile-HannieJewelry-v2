@@ -31,7 +31,7 @@ class _PaymentMethodModalState extends State<PaymentMethodModal> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Phương thức thanh toán',
+                'Payment Method',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               IconButton(
@@ -41,19 +41,19 @@ class _PaymentMethodModalState extends State<PaymentMethodModal> {
             ],
           ),
           const SizedBox(height: 16),
-          // COD
+          // COD option
           _buildPaymentOption(
             PaymentMethod.cod,
             'COD',
-            'Thanh toán khi nhận hàng',
+            'Pay on delivery',
             Icons.payments_outlined,
           ),
           const SizedBox(height: 12),
-          // Chuyển khoản
+          // Bank transfer option
           _buildPaymentOption(
             PaymentMethod.bankTransfer,
-            'Chuyển khoản',
-            'Thanh toán qua ngân hàng',
+            'Bank Transfer',
+            'Pay via bank account',
             Icons.account_balance_outlined,
           ),
           const SizedBox(height: 24),
@@ -63,8 +63,8 @@ class _PaymentMethodModalState extends State<PaymentMethodModal> {
               onPressed: () {
                 widget.onSelect(_selectedMethod);
                 Navigator.pop(context);
-                
-                // Nếu chọn chuyển khoản và có thông tin đơn hàng, hiển thị màn hình QR
+
+                // If bank transfer selected and order is provided, show QR screen
                 if (_selectedMethod == PaymentMethod.bankTransfer && widget.order != null) {
                   Navigator.push(
                     context,
@@ -73,7 +73,7 @@ class _PaymentMethodModalState extends State<PaymentMethodModal> {
                         order: widget.order!,
                         bankName: 'Vietcombank',
                         accountNumber: '1234567890',
-                        accountName: 'CÔNG TY TNHH HUY THANH',
+                        accountName: 'HUY THANH CO., LTD',
                       ),
                     ),
                   );
@@ -84,7 +84,7 @@ class _PaymentMethodModalState extends State<PaymentMethodModal> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: const Text(
-                'Đồng ý',
+                'Confirm',
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
@@ -95,13 +95,13 @@ class _PaymentMethodModalState extends State<PaymentMethodModal> {
   }
 
   Widget _buildPaymentOption(
-    PaymentMethod method,
-    String title,
-    String subtitle,
-    IconData icon,
-  ) {
+      PaymentMethod method,
+      String title,
+      String subtitle,
+      IconData icon,
+      ) {
     final isSelected = _selectedMethod == method;
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {

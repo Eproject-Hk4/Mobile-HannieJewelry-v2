@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_styles.dart';
 
-
 class ContactScreen extends StatelessWidget {
   const ContactScreen({Key? key}) : super(key: key);
 
@@ -12,7 +11,7 @@ class ContactScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Liên hệ'),
+        title: const Text('Contact Us'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -39,25 +38,25 @@ class ContactScreen extends StatelessWidget {
               ),
               _buildContactItem(
                 icon: Icons.location_on,
-                title: 'Địa chỉ',
-                content: '123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh',
+                title: 'Address',
+                content: '123 ABC Street, XYZ District, Ho Chi Minh City',
                 onTap: () {},
               ),
               _buildContactItem(
                 icon: Icons.access_time,
-                title: 'Giờ làm việc',
-                content: 'Thứ 2 - Thứ 6: 8:00 - 17:30\nThứ 7: 8:00 - 12:00',
+                title: 'Working Hours',
+                content: 'Mon - Fri: 8:00 AM - 5:30 PM\nSat: 8:00 AM - 12:00 PM',
                 onTap: () {},
               ),
               const SizedBox(height: 24),
               Text(
-                'Gửi tin nhắn cho chúng tôi',
+                'Send us a message',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
               TextField(
                 decoration: InputDecoration(
-                  hintText: 'Họ và tên',
+                  hintText: 'Full Name',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -75,7 +74,7 @@ class ContactScreen extends StatelessWidget {
               const SizedBox(height: 16),
               TextField(
                 decoration: InputDecoration(
-                  hintText: 'Số điện thoại',
+                  hintText: 'Phone Number',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -85,7 +84,7 @@ class ContactScreen extends StatelessWidget {
               TextField(
                 maxLines: 5,
                 decoration: InputDecoration(
-                  hintText: 'Nội dung',
+                  hintText: 'Message',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -98,7 +97,7 @@ class ContactScreen extends StatelessWidget {
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Tin nhắn đã được gửi'),
+                        content: Text('Your message has been sent'),
                         duration: Duration(seconds: 2),
                       ),
                     );
@@ -110,7 +109,7 @@ class ContactScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text('Gửi tin nhắn'),
+                  child: const Text('Send Message'),
                 ),
               ),
             ],

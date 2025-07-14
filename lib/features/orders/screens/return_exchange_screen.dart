@@ -34,8 +34,8 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
         final orderService = Provider.of<OrderService>(context, listen: false);
         final order = orderService.getOrderById(widget.orderId!);
         if (order != null) {
-          setState(() {
-            _selectedOrder = order;
+          setState(() async {
+            _selectedOrder = await order;
           });
         }
       });
@@ -108,8 +108,8 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
               final orderService = Provider.of<OrderService>(context, listen: false);
               final order = orderService.getOrderById(result);
               if (order != null) {
-                setState(() {
-                  _selectedOrder = order;
+                setState(() async {
+                  _selectedOrder = await order;
                   _selectedItems = [];
                 });
               }

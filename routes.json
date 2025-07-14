@@ -1,0 +1,10 @@
+{
+  "/api/auth/login": "/users?phone=:phone",
+  "/api/auth/register": "/users",
+  "/api/cart": "/cart?user_id=:user_id",
+  "/api/cart/add": "/cart?user_id=:user_id",
+  "/api/cart/update": "/cart?user_id=:user_id",
+  "/api/cart/item/:id": "/cart?user_id=:user_id",
+  "/api/cart/clear": "/cart?user_id=:user_id",
+  "/api/orders": "/orders?user_id=:user_id"
+}

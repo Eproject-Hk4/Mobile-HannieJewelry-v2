@@ -7,7 +7,6 @@ import 'home_screen.dart';
 import 'promotions_screen.dart';
 import 'qr_scan_screen.dart';
 
-
 class BranchScreen extends StatefulWidget {
   const BranchScreen({Key? key}) : super(key: key);
 
@@ -17,13 +16,13 @@ class BranchScreen extends StatefulWidget {
 
 class _BranchScreenState extends State<BranchScreen> {
   final TextEditingController _searchController = TextEditingController();
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Chi nhánh'),
+        title: const Text('Branches'),
         centerTitle: true,
       ),
       body: Column(
@@ -47,7 +46,7 @@ class _BranchScreenState extends State<BranchScreen> {
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Tìm kiếm...',
+                  hintText: 'Search branches...',
                   prefixIcon: const Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 15),
@@ -55,14 +54,14 @@ class _BranchScreenState extends State<BranchScreen> {
               ),
             ),
           ),
-          
-          // Map view - takes most of the screen
+
+          // Placeholder map view
           Expanded(
             child: Container(
-              color: Colors.grey[200], // Placeholder for the map
+              color: Colors.grey[200],
               child: Center(
                 child: Text(
-                  'Bản đồ chi nhánh',
+                  'Branch Map',
                   style: AppStyles.bodyText,
                 ),
               ),
@@ -74,39 +73,34 @@ class _BranchScreenState extends State<BranchScreen> {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: Colors.grey,
-        currentIndex: 3, // Highlight the branch tab
+        currentIndex: 3, // Highlight the "Branch" tab
         onTap: (index) {
           if (index == 0) {
-            // Navigate to Home
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => const HomeScreen()),
             );
           } else if (index == 1) {
-            // Navigate to Promotions
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => const PromotionsScreen()),
             );
           } else if (index == 2) {
-            // Navigate to QR Scan
             Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const QRScanScreen()),
             );
           } else if (index == 4) {
-            // Navigate to Profile
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => const ProfileScreen()),
             );
           }
-          // Current tab (index 3) doesn't need navigation
         },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Trang chủ',
+            label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.card_giftcard),
-            label: 'Ưu đãi',
+            label: 'Promotions',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.qr_code_scanner),
@@ -114,11 +108,11 @@ class _BranchScreenState extends State<BranchScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_bag),
-            label: 'Chi nhánh',
+            label: 'Branches',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Cá nhân',
+            label: 'Profile',
           ),
         ],
       ),

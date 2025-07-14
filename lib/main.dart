@@ -1,72 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 
-import 'package:flutter_native_splash/flutter_native_splash.dart';
-
-import 'core/constants/app_colors.dart';
+import 'app/app.dart';
+import 'app/app_provider.dart';
 import 'features/auth/screens/login_screen.dart';
-import 'features/auth/services/auth_service.dart';
-import 'features/cart/services/cart_service.dart';
-import 'features/orders/services/order_service.dart'; // Thêm import OrderService
-import 'features/notifications/services/notification_service.dart';
 
 void main() async {
-  // Xóa hoặc comment các dòng này
-  // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  
-  WidgetsFlutterBinding.ensureInitialized(); // Vẫn cần dòng này
+  WidgetsFlutterBinding.ensureInitialized();
   
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
   
-  // Initialize AuthService
-  final authService = AuthService();
-  await authService.initialize();
+  // Khởi tạo providers
+  await AppProvider.init();
   
-  // Xóa hoặc comment dòng này
-  // FlutterNativeSplash.remove();
-  
-  runApp(MyApp(authService: authService));
+  runApp(const App());
 }
 
-class MyApp extends StatelessWidget {
-  final AuthService authService;
-  
-  const MyApp({super.key, required this.authService});
-  
-  @override
-  Widget build(BuildContext context) {
-    // Thay đổi màn hình khởi động từ LoginScreen sang SplashScreen
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: authService),
-        ChangeNotifierProvider(create: (ctx) => CartService()),
-        // Thêm OrderService
-        ChangeNotifierProxyProvider<AuthService, OrderService>(
-          create: (context) => OrderService(Provider.of<AuthService>(context, listen: false)),
-          update: (context, auth, previous) => OrderService(auth),
-        ),
-        ChangeNotifierProvider(create: (_) => NotificationService()),
-      ],
-      child: MaterialApp(
-        title: 'Hannie Jewelry',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
-          useMaterial3: true,
-          fontFamily: 'Montserrat',
-        ),
-        home: const SplashScreen(), // Thay đổi từ LoginScreen sang SplashScreen
-      ),
-    );
-  }
-}
-
-// Custom splash screen if you want to use it later
+// Splash Screen
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
   
@@ -74,6 +27,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
+// Giữ lại phần code SplashScreen hiện có
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {

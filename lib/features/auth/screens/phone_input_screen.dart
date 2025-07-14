@@ -25,11 +25,11 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   }
 
   Future<void> _sendOTP() async {
-    // Kiểm tra số điện thoại hợp lệ
+    // Check for valid phone number
     final phone = _phoneController.text.trim();
     if (phone.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập số điện thoại')),
+        const SnackBar(content: Text('Please enter your phone number')),
       );
       return;
     }
@@ -54,7 +54,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       );
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không thể gửi OTP. Vui lòng thử lại.')),
+        const SnackBar(content: Text('Unable to send OTP. Please try again.')),
       );
     }
   }
@@ -76,19 +76,19 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
             children: [
               const SizedBox(height: 24),
               Text(
-                'Đăng nhập bằng OTP',
+                AppStrings.loginWithOTP,
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 8),
               Text(
-                'Nhập số điện thoại để nhận mã xác thực',
+                'Enter your phone number to receive a verification code',
                 style: AppStyles.bodyTextSmall,
               ),
               const SizedBox(height: 32),
               TextField(
                 controller: _phoneController,
                 decoration: const InputDecoration(
-                  labelText: 'Số điện thoại',
+                  labelText: 'Phone number',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.phone),
                 ),
@@ -98,9 +98,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : CustomButton(
-                      text: 'Gửi mã xác thực',
-                      onPressed: _sendOTP,
-                    ),
+                text: 'Send verification code',
+                onPressed: _sendOTP,
+              ),
             ],
           ),
         ),
