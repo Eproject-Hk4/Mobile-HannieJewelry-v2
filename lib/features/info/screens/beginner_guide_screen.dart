@@ -11,7 +11,7 @@ class BeginnerGuideScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Dành cho người mới bắt đầu'),
+        title: const Text('For Beginners'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -25,47 +25,47 @@ class BeginnerGuideScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'ĐIỀU KHOẢN GIAO DỊCH CHUNG',
+                'GENERAL TRANSACTION TERMS',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               const Text(
-                'IV. ĐIỀU KHOẢN GIAO DỊCH CHUNG',
+                'IV. GENERAL TRANSACTION TERMS',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               const Text(
-                '1. Chính sách kiểm hàng',
+                '1. Product Inspection Policy',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Nhằm đảm bảo quyền lợi người tiêu dùng, nâng cao chất lượng dịch vụ sau bán hàng, Huy Thanh sẽ hỗ trợ Quý khách thực hiện đổi sản phẩm mới. Hoặc trả lại sản phẩm, hoàn tiền hàng cho quý khách. (Nhưng không hoàn lại phí vận chuyển hoặc lệ phí giao hàng nếu có).',
+                'To ensure consumer rights and improve after-sales service quality, Hannie Jewelry will support customers with product exchanges or returns and refunds (but shipping fees or delivery charges, if any, are non-refundable).',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
               const Text(
-                '• Thời điểm kiểm hàng.',
+                '• Inspection Timing',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Huy Thanh chấp nhận cho khách hàng đồng kiểm với nhân viên giao hàng tại thời điểm nhận hàng.',
+                'Hannie Jewelry allows customers to inspect products together with the delivery staff at the time of receipt.',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Sau khi nhận hàng, quý khách vui lòng quay video khi bóc hàng. Khách hàng kiểm lại phát hiện sai, có thể liên lạc với bộ phận chăm sóc khách hàng để được hỗ trợ.',
+                'After receiving the package, please record a video while unboxing. If customers discover any issues, they can contact customer service for assistance.',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
               const Text(
-                '• Phạm vi kiểm tra hàng hóa.',
+                '• Scope of Product Inspection',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Khách hàng được kiểm tra đúng số lượng sản phẩm thực nhận, đối chiếu, so sánh các sản phẩm nhận được đúng với hình ảnh thực tế của sản phẩm đã đặt trên đơn sau khi nhân viên Huy Thanh xác nhận.',
+                'Customers are allowed to verify the correct quantity of products received and compare the received products with the actual images of the products ordered after confirmation by Hannie Jewelry staff.',
                 style: TextStyle(fontSize: 16),
               ),
             ],

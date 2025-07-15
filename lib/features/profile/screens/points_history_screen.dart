@@ -11,7 +11,7 @@ class PointsHistoryScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Lịch sử tích điểm'),
+        title: const Text('Points History'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -42,7 +42,7 @@ class PointsHistoryScreen extends StatelessWidget {
                     const Icon(Icons.favorite, color: AppColors.primary),
                     const SizedBox(width: 8),
                     Text(
-                      'Tổng điểm',
+                      'Total Points',
                       style: AppStyles.bodyText,
                     ),
                     const Spacer(),
@@ -55,7 +55,7 @@ class PointsHistoryScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'Lịch sử tích điểm',
+                'Points History',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
@@ -68,7 +68,7 @@ class PointsHistoryScreen extends StatelessWidget {
   }
 
   Widget _buildHistoryList() {
-    // Giả lập danh sách trống
+    // Simulating empty list
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -80,14 +80,14 @@ class PointsHistoryScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Không có lịch sử tích điểm',
+            'No points history',
             style: AppStyles.bodyText.copyWith(color: Colors.grey),
           ),
         ],
       ),
     );
 
-    // Khi có dữ liệu, bạn có thể sử dụng mã sau:
+    // When there is data, you can use the following code:
     /*
     return ListView.builder(
       shrinkWrap: true,
@@ -106,7 +106,7 @@ class PointsHistoryScreen extends StatelessWidget {
                     const Icon(Icons.add_circle, color: Colors.green),
                     const SizedBox(width: 8),
                     Text(
-                      '+10 điểm',
+                      '+10 points',
                       style: AppStyles.bodyText.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.green,
@@ -124,7 +124,7 @@ class PointsHistoryScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Đơn hàng #12345',
+                  'Order #12345',
                   style: AppStyles.bodyText,
                 ),
               ],

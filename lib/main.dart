@@ -13,7 +13,7 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
   
-  // Khởi tạo providers
+  // Initialize providers
   await AppProvider.init();
   
   runApp(const App());
@@ -27,12 +27,12 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-// Giữ lại phần code SplashScreen hiện có
+// Keep the existing SplashScreen code
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Chuyển sang LoginScreen sau 2 giây
+    // Navigate to LoginScreen after 1 second
     Future.delayed(const Duration(seconds: 1), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -144,4 +144,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-

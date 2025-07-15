@@ -27,7 +27,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Theo dõi đơn hàng'),
+        title: const Text('Order Tracking'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -41,18 +41,18 @@ class _TrackingScreenState extends State<TrackingScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Nhập mã đơn hàng',
+                'Enter Order Code',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
-              // Thêm import
+              // Add import
 
 
               
-              // Trong phần xử lý tìm kiếm đơn hàng
+              // In the order search processing section
               TextField(
                 decoration: InputDecoration(
-                  hintText: 'Mã đơn hàng',
+                  hintText: 'Order Code',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -75,7 +75,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Không tìm thấy đơn hàng'),
+                            content: Text('Order not found'),
                             duration: Duration(seconds: 2),
                           ),
                         );
@@ -87,7 +87,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Đơn hàng gần đây',
+                'Recent Orders',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
@@ -102,12 +102,12 @@ class _TrackingScreenState extends State<TrackingScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Bạn chưa có đơn hàng nào',
+                      'You have no orders yet',
                       style: AppStyles.bodyText.copyWith(color: Colors.grey),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Vui lòng đăng nhập để xem đơn hàng của bạn',
+                      'Please login to view your orders',
                       style: AppStyles.bodyTextSmall.copyWith(color: Colors.grey),
                     ),
                     const SizedBox(height: 24),
@@ -115,7 +115,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Chức năng đăng nhập đang được phát triển'),
+                            content: Text('Login feature is under development'),
                             duration: Duration(seconds: 2),
                           ),
                         );
@@ -130,7 +130,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: const Text('Đăng nhập'),
+                      child: const Text('Login'),
                     ),
                   ],
                 ),

@@ -12,7 +12,7 @@ class RewardsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Đổi thưởng'),
+        title: const Text('Rewards'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -26,7 +26,7 @@ class RewardsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Phần thưởng có sẵn',
+                'Available Rewards',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
@@ -63,14 +63,14 @@ class RewardsScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Voucher giảm ${(index + 1) * 10}%',
+                                  '${(index + 1) * 10}% Discount Voucher',
                                   style: AppStyles.bodyText.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Áp dụng cho mọi đơn hàng',
+                                  'Applicable to all orders',
                                   style: AppStyles.bodyTextSmall,
                                 ),
                               ],
@@ -91,7 +91,7 @@ class RewardsScreen extends StatelessWidget {
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text('Bạn cần đăng nhập để đổi thưởng'),
+                                      content: Text('You need to log in to redeem rewards'),
                                       duration: Duration(seconds: 2),
                                     ),
                                   );
@@ -106,7 +106,7 @@ class RewardsScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                 ),
-                                child: const Text('Đổi'),
+                                child: const Text('Redeem'),
                               ),
                             ],
                           ),

@@ -45,7 +45,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Lịch sử đơn hàng'),
+        title: const Text('Order History'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -68,7 +68,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Bạn chưa có đơn hàng nào',
+                          'You don\'t have any orders yet',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey.withOpacity(0.8),
@@ -104,7 +104,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Đơn hàng #${order.id}',
+                                      'Order #${order.id}',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
@@ -129,7 +129,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                             child: Text(item.name),
                                           ),
                                           Text(
-                                            '${_formatCurrency(item.price * item.quantity)} đ',
+                                            '${_formatCurrency(item.price * item.quantity)} VND',
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -142,13 +142,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text(
-                                      'Tổng tiền:',
+                                      'Total:',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     Text(
-                                      '${_formatCurrency(order.totalAmount)} đ',
+                                      '${_formatCurrency(order.totalAmount)} VND',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.primary,
@@ -169,8 +169,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   }
 
   Widget _buildOrderStatus(OrderModel order) {
-    // Trong thực tế, bạn sẽ lấy trạng thái từ đơn hàng
-    // Đây là mô phỏng trạng thái đơn hàng
+    // In reality, you would get the status from the order
+    // This is a simulation of the order status
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -178,7 +178,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         borderRadius: BorderRadius.circular(4),
       ),
       child: const Text(
-        'Đã giao hàng',
+        'Delivered',
         style: TextStyle(
           color: Colors.green,
           fontWeight: FontWeight.bold,

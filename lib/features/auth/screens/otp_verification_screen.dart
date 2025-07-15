@@ -7,7 +7,12 @@ import '../../home/screens/home_screen.dart';
 import '../services/auth_service.dart';
 
 class OTPVerificationScreen extends StatefulWidget {
-  const OTPVerificationScreen({Key? key}) : super(key: key);
+  final bool isRegistration;
+  
+  const OTPVerificationScreen({
+    Key? key, 
+    this.isRegistration = false,
+  }) : super(key: key);
 
   @override
   State<OTPVerificationScreen> createState() => _OTPVerificationScreenState();
@@ -53,13 +58,21 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     });
 
     final authService = Provider.of<AuthService>(context, listen: false);
-    final success = await authService.verifyOTP(otp);
+    final success = await authService.verifyOTP(otp, isRegistration: widget.isRegistration);
 
     setState(() {
       _isLoading = false;
     });
 
     if (success && mounted) {
+      // Show success message for registration
+      if (widget.isRegistration && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration successful!')),
+        );
+      }
+      
+      // Navigate to home screen
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -82,6 +95,14 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
     final phoneNumber = authService.phoneNumber ?? '';
+    
+    final screenTitle = widget.isRegistration 
+        ? 'Complete Registration' 
+        : 'OTP Verification';
+    
+    final screenSubtitle = widget.isRegistration
+        ? 'Enter the verification code to complete your registration'
+        : 'Enter the verification code sent to $phoneNumber';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -98,12 +119,12 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
             children: [
               const SizedBox(height: 24),
               Text(
-                'OTP Verification',
+                screenTitle,
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 8),
               Text(
-                'Enter the verification code sent to $phoneNumber',
+                screenSubtitle,
                 style: AppStyles.bodyTextSmall,
               ),
               const SizedBox(height: 32),

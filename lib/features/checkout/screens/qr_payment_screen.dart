@@ -33,7 +33,7 @@ class _QRPaymentScreenState extends State<QRPaymentScreen> {
   String _generateVietQRContent() {
     // Format: bankCode|accountNumber|amount|content
     // This is a simplified format. Actual VietQR format might differ
-    final formattedAmount = widget.order.totalAmount.toStringAsFixed(0);
+    final formattedAmount = widget.order.totalAmount.toString();
     return "${widget.bankName}|${widget.accountNumber}|$formattedAmount|Payment for order ${widget.order.id}";
   }
 
@@ -74,7 +74,7 @@ class _QRPaymentScreenState extends State<QRPaymentScreen> {
                   const Divider(),
                   _buildInfoRow(
                     'Total Amount',
-                    '${widget.order.totalAmount.toStringAsFixed(0)} đ',
+                    _formatCurrency(widget.order.totalAmount),
                   ),
                 ],
               ),
@@ -133,7 +133,7 @@ class _QRPaymentScreenState extends State<QRPaymentScreen> {
                   const Divider(),
                   _buildCopyableInfoRow(
                     'Amount',
-                    '${widget.order.totalAmount.toStringAsFixed(0)} đ',
+                    _formatCurrency(widget.order.totalAmount),
                   ),
                   const Divider(),
                   _buildCopyableInfoRow(
@@ -165,7 +165,7 @@ class _QRPaymentScreenState extends State<QRPaymentScreen> {
                   Text(
                     '- Please complete the payment within 24 hours after placing the order.\n'
                         '- Your order will be processed after we receive the payment.\n'
-                        '- For support, contact hotline: 0345 807 906',
+                        '- For support, contact our hotline: +84 345 807 906',
                   ),
                 ],
               ),
@@ -224,5 +224,17 @@ class _QRPaymentScreenState extends State<QRPaymentScreen> {
         ],
       ),
     );
+  }
+
+  String _formatCurrency(double price) {
+    String priceString = price.toInt().toString();
+    final result = StringBuffer();
+    for (int i = 0; i < priceString.length; i++) {
+      if ((priceString.length - i) % 3 == 0 && i > 0) {
+        result.write('.');
+      }
+      result.write(priceString[i]);
+    }
+    return '${result.toString()} ₫';
   }
 }

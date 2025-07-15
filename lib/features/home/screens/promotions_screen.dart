@@ -26,7 +26,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> with SingleTickerPr
   
   void _handleTabChange() {
     if (_tabController.index == 1) {
-      // Khi người dùng chọn tab "Ưu đãi của tôi"
+      // When user selects "My Promotions" tab
       Future.delayed(Duration.zero, () {
         _showLoginDialog();
       });
@@ -39,12 +39,12 @@ class _PromotionsScreenState extends State<PromotionsScreen> with SingleTickerPr
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(
-            'Thông báo',
+            'Notification',
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           content: const Text(
-            'Bạn cần đăng nhập để sử dụng chức năng này',
+            'You need to log in to use this feature',
             textAlign: TextAlign.center,
           ),
           shape: RoundedRectangleBorder(
@@ -56,7 +56,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> with SingleTickerPr
                 Expanded(
                   child: TextButton(
                     child: const Text(
-                      'Hủy',
+                      'Cancel',
                       style: TextStyle(color: Colors.black),
                     ),
                     style: TextButton.styleFrom(
@@ -72,7 +72,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> with SingleTickerPr
                 Expanded(
                   child: TextButton(
                     child: const Text(
-                      'Xác nhận',
+                      'Confirm',
                       style: TextStyle(color: Colors.white),
                     ),
                     style: TextButton.styleFrom(
@@ -106,7 +106,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> with SingleTickerPr
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Ưu đãi'),
+        title: const Text('Promotions'),
         centerTitle: true,
         elevation: 0,
         bottom: TabBar(
@@ -115,18 +115,18 @@ class _PromotionsScreenState extends State<PromotionsScreen> with SingleTickerPr
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white.withOpacity(0.7),
           tabs: const [
-            Tab(text: 'Tất cả'),
-            Tab(text: 'Ưu đãi của tôi'),
+            Tab(text: 'All'),
+            Tab(text: 'My Promotions'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          // Tab 1: Tất cả
+          // Tab 1: All
           _buildAllPromotionsTab(),
           
-          // Tab 2: Ưu đãi của tôi
+          // Tab 2: My Promotions
           _buildMyPromotionsTab(),
         ],
       ),
@@ -157,11 +157,11 @@ class _PromotionsScreenState extends State<PromotionsScreen> with SingleTickerPr
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Trang chủ',
+            label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.card_giftcard),
-            label: 'Ưu đãi',
+            label: 'Promotions',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.qr_code_scanner),
@@ -169,11 +169,11 @@ class _PromotionsScreenState extends State<PromotionsScreen> with SingleTickerPr
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_bag),
-            label: 'Chi nhánh',
+            label: 'Branches',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Cá nhân',
+            label: 'Profile',
           ),
         ],
       ),
@@ -194,7 +194,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> with SingleTickerPr
     // This would normally contain a list of promotions
     // For now, we'll just show a placeholder
     return const Center(
-      child: Text('Không có nội dung nào để hiển thị'),
+      child: Text('No content to display'),
     );
   }
   
@@ -207,7 +207,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> with SingleTickerPr
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           color: Colors.orange,
           child: const Text(
-            'Bạn cần đăng nhập để sử dụng chức năng này',
+            'You need to log in to use this feature',
             style: TextStyle(color: Colors.white),
             textAlign: TextAlign.center,
           ),
@@ -217,7 +217,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> with SingleTickerPr
         const Expanded(
           child: Center(
             child: Text(
-              'Không có nội dung nào để hiển thị',
+              'No content to display',
               style: TextStyle(color: Colors.grey),
             ),
           ),

@@ -38,16 +38,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _isLoading = true;
     });
 
-    // Trong thực tế, bạn sẽ gọi API để cập nhật thông tin người dùng
-    // Đây là mô phỏng cập nhật thành công
+    // In reality, you would call an API to update user information
+    // This is simulating a successful update
     await Future.delayed(const Duration(seconds: 1));
 
-    // Hiển thị thông báo thành công
+    // Show success message
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cập nhật thông tin thành công')),
+        const SnackBar(content: Text('Profile updated successfully')),
       );
-      Navigator.pop(context, true); // Trả về true để biết đã cập nhật thành công
+      Navigator.pop(context, true); // Return true to indicate successful update
     }
 
     setState(() {
@@ -59,7 +59,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chỉnh sửa thông tin'),
+        title: const Text('Edit Profile'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
@@ -101,7 +101,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(
-                labelText: 'Họ và tên',
+                labelText: 'Full Name',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.person),
               ),
@@ -110,12 +110,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             TextField(
               controller: _phoneController,
               decoration: const InputDecoration(
-                labelText: 'Số điện thoại',
+                labelText: 'Phone Number',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.phone),
               ),
               keyboardType: TextInputType.phone,
-              enabled: false, // Không cho phép sửa số điện thoại
+              enabled: false, // Phone number cannot be edited
             ),
             const SizedBox(height: 16),
             TextField(
@@ -129,7 +129,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 16),
             TextField(
               decoration: const InputDecoration(
-                labelText: 'Ngày sinh',
+                labelText: 'Date of Birth',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.calendar_today),
                 hintText: 'DD-MM-YYYY',
@@ -148,25 +148,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 children: [
                   const Icon(Icons.person_outline, color: Colors.grey),
                   const SizedBox(width: 12),
-                  const Text('Giới tính'),
+                  const Text('Gender'),
                   const Spacer(),
                   Row(
                     children: [
                       Radio(
-                        value: 'Nam',
-                        groupValue: 'Nam',
+                        value: 'Male',
+                        groupValue: 'Male',
                         onChanged: (value) {},
                         activeColor: AppColors.primary,
                       ),
-                      const Text('Nam'),
+                      const Text('Male'),
                       const SizedBox(width: 16),
                       Radio(
-                        value: 'Nữ',
-                        groupValue: 'Nam',
+                        value: 'Female',
+                        groupValue: 'Male',
                         onChanged: (value) {},
                         activeColor: AppColors.primary,
                       ),
-                      const Text('Nữ'),
+                      const Text('Female'),
                     ],
                   ),
                 ],
@@ -189,7 +189,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                       child: const Text(
-                        'Lưu thông tin',
+                        'Save Information',
                         style: TextStyle(fontSize: 16),
                       ),
                     ),

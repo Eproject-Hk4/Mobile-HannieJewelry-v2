@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';  // Thêm dòng này
+import 'package:intl/intl.dart';  // Add this line
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_styles.dart';
@@ -17,7 +17,7 @@ class NotificationsScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Thông báo'),
+        title: const Text('Notifications'),
         centerTitle: true,
         actions: [
           IconButton(
@@ -25,10 +25,10 @@ class NotificationsScreen extends StatelessWidget {
             onPressed: () {
               Provider.of<NotificationService>(context, listen: false).markAllAsRead();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Đã đánh dấu tất cả thông báo là đã đọc')),
+                const SnackBar(content: Text('All notifications marked as read')),
               );
             },
-            tooltip: 'Đánh dấu tất cả đã đọc',
+            tooltip: 'Mark all as read',
           ),
         ],
       ),
@@ -48,7 +48,7 @@ class NotificationsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Không có thông báo nào',
+                    'No notifications',
                     style: AppStyles.heading.copyWith(color: Colors.grey[600]),
                   ),
                 ],
@@ -58,7 +58,7 @@ class NotificationsScreen extends StatelessWidget {
           
           return RefreshIndicator(
             onRefresh: () async {
-              // Làm mới danh sách thông báo
+              // Refresh notifications list
               await notificationService.refreshNotifications();
             },
             child: ListView.builder(
@@ -91,14 +91,14 @@ class NotificationsScreen extends StatelessWidget {
         Provider.of<NotificationService>(context, listen: false)
             .deleteNotification(notification.id);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đã xóa thông báo')),
+          SnackBar(content: Text('Notification deleted')),
         );
       },
       child: InkWell(
         onTap: () {
           Provider.of<NotificationService>(context, listen: false)
               .markAsRead(notification.id);
-          // Chuyển đến màn hình chi tiết thông báo
+          // Navigate to notification detail screen
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => NotificationDetailScreen(notification: notification),

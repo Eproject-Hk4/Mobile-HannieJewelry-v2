@@ -12,7 +12,7 @@ class WarrantyScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Bảo hành'),
+        title: const Text('Warranty'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -26,7 +26,7 @@ class WarrantyScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Chính sách bảo hành',
+                'Warranty Policy',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
@@ -40,29 +40,29 @@ class WarrantyScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Thời gian bảo hành',
+                        'Warranty Period',
                         style: AppStyles.bodyText.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '- Sản phẩm được bảo hành 12 tháng kể từ ngày mua hàng\n'
-                        '- Phụ kiện được bảo hành 6 tháng kể từ ngày mua hàng',
+                        '- Products are warranted for 12 months from the date of purchase\n'
+                        '- Accessories are warranted for 6 months from the date of purchase',
                         style: AppStyles.bodyTextSmall,
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Điều kiện bảo hành',
+                        'Warranty Conditions',
                         style: AppStyles.bodyText.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '- Sản phẩm còn trong thời gian bảo hành\n'
-                        '- Sản phẩm có tem bảo hành và hóa đơn mua hàng\n'
-                        '- Sản phẩm không bị tác động bởi người sử dụng',
+                        '- Product is still within the warranty period\n'
+                        '- Product has warranty seal and purchase invoice\n'
+                        '- Product has not been tampered with by the user',
                         style: AppStyles.bodyTextSmall,
                       ),
                     ],
@@ -71,13 +71,13 @@ class WarrantyScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'Kiểm tra bảo hành',
+                'Check Warranty Status',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
               TextField(
                 decoration: InputDecoration(
-                  hintText: 'Nhập mã sản phẩm',
+                  hintText: 'Enter product code',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -86,7 +86,7 @@ class WarrantyScreen extends StatelessWidget {
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Không tìm thấy thông tin bảo hành'),
+                          content: Text('No warranty information found'),
                           duration: Duration(seconds: 2),
                         ),
                       );
@@ -96,7 +96,7 @@ class WarrantyScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'Trung tâm bảo hành',
+                'Warranty Centers',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
@@ -116,7 +116,7 @@ class WarrantyScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Trung tâm bảo hành ${index + 1}',
+                            'Warranty Center ${index + 1}',
                             style: AppStyles.bodyText.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -128,7 +128,7 @@ class WarrantyScreen extends StatelessWidget {
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
-                                  'Địa chỉ ${index + 1}, Quận ${index + 1}, TP. Hồ Chí Minh',
+                                  'Address ${index + 1}, District ${index + 1}, Ho Chi Minh City',
                                   style: AppStyles.bodyTextSmall,
                                 ),
                               ),

@@ -15,18 +15,18 @@ class _SurveyScreenState extends State<SurveyScreen> {
   int _currentQuestionIndex = 0;
   final List<Map<String, dynamic>> _questions = [
     {
-      'question': 'Bạn biết đến cửa hàng của chúng tôi qua đâu?',
-      'options': ['Bạn bè giới thiệu', 'Mạng xã hội', 'Tìm kiếm Google', 'Khác'],
+      'question': 'How did you hear about our store?',
+      'options': ['Friend recommendation', 'Social media', 'Google search', 'Other'],
       'answer': null,
     },
     {
-      'question': 'Bạn thường mua sắm tại cửa hàng với tần suất như thế nào?',
-      'options': ['Hàng tuần', 'Hàng tháng', 'Vài tháng một lần', 'Hiếm khi'],
+      'question': 'How often do you shop at our store?',
+      'options': ['Weekly', 'Monthly', 'Once every few months', 'Rarely'],
       'answer': null,
     },
     {
-      'question': 'Bạn hài lòng với chất lượng sản phẩm của chúng tôi?',
-      'options': ['Rất hài lòng', 'Hài lòng', 'Bình thường', 'Không hài lòng'],
+      'question': 'Are you satisfied with the quality of our products?',
+      'options': ['Very satisfied', 'Satisfied', 'Neutral', 'Not satisfied'],
       'answer': null,
     },
   ];
@@ -36,7 +36,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Phiếu khảo sát'),
+        title: const Text('Survey'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -58,7 +58,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'Câu ${_currentQuestionIndex + 1}/${_questions.length}',
+                  'Question ${_currentQuestionIndex + 1}/${_questions.length}',
                   style: AppStyles.bodyTextSmall.copyWith(color: Colors.grey),
                 ),
               ],
@@ -150,7 +150,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text('Quay lại'),
+                    child: const Text('Back'),
                   )
                 else
                   const SizedBox(),
@@ -161,10 +161,10 @@ class _SurveyScreenState extends State<SurveyScreen> {
                         _currentQuestionIndex++;
                       });
                     } else {
-                      // Hoàn thành khảo sát
+                      // Complete the survey
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Cảm ơn bạn đã hoàn thành khảo sát'),
+                          content: Text('Thank you for completing the survey'),
                           duration: Duration(seconds: 2),
                         ),
                       );
@@ -182,7 +182,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     ),
                   ),
                   child: Text(
-                    _currentQuestionIndex < _questions.length - 1 ? 'Tiếp theo' : 'Hoàn thành',
+                    _currentQuestionIndex < _questions.length - 1 ? 'Next' : 'Complete',
                   ),
                 ),
               ],

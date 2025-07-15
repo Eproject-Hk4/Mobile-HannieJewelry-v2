@@ -11,4 +11,5 @@ abstract class Routes {
   static const PROFILE = '/profile';
   static const NOTIFICATIONS = '/notifications';
   static const COMPANY_INFO = '/company-info';
+
 }

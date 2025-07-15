@@ -12,7 +12,7 @@ class PointsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Tích điểm'),
+        title: const Text('Loyalty Points'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -26,7 +26,7 @@ class PointsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Điểm tích lũy của bạn',
+                'Your Loyalty Points',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
@@ -48,7 +48,7 @@ class PointsScreen extends StatelessWidget {
                     const Icon(Icons.favorite, color: AppColors.primary),
                     const SizedBox(width: 8),
                     Text(
-                      'Tổng điểm',
+                      'Total Points',
                       style: AppStyles.bodyText,
                     ),
                     const Spacer(),
@@ -61,7 +61,7 @@ class PointsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'Lịch sử tích điểm',
+                'Points History',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
@@ -76,7 +76,7 @@ class PointsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Không có lịch sử tích điểm',
+                      'No points history available',
                       style: AppStyles.bodyText.copyWith(color: Colors.grey),
                     ),
                   ],

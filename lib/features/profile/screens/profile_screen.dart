@@ -10,13 +10,12 @@ import '../../home/screens/home_screen.dart';
 import '../../home/screens/promotions_screen.dart';
 import '../../home/screens/qr_scan_screen.dart';
 import '../../home/screens/support_center_screen.dart';
-import '../../orders/screens/order_history_screen.dart'; // Di chuyển import lên đây
+import '../../orders/screens/order_history_screen.dart'; // Move import here
 import 'address_book_screen.dart';
 import 'delete_account_screen.dart';
 import 'edit_profile_screen.dart';
 import 'points_screen.dart';
 import 'referral_screen.dart';
-
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -28,7 +27,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    // Lấy thông tin đăng nhập từ AuthService
+    // Get login information from AuthService
     final authService = Provider.of<AuthService>(context);
     final isLoggedIn = authService.isAuthenticated;
     final user = authService.currentUser;
@@ -62,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isLoggedIn ? user?.name ?? 'Người dùng' : 'Guest',
+                            isLoggedIn ? user?.name ?? 'User' : 'Guest',
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -70,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           Text(
-                            isLoggedIn ? user?.phone ?? '' : 'Số điện thoại chưa xác thực',
+                            isLoggedIn ? user?.phone ?? '' : 'Phone number not verified',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.white.withOpacity(0.9),
@@ -102,7 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Row(
                         children: [
                           Text(
-                            isLoggedIn ? 'Chỉnh sửa' : 'Đăng nhập',
+                            isLoggedIn ? 'Edit' : 'Login',
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -143,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(width: 16),
                     // Points text
                     const Text(
-                      'Điểm tích lũy',
+                      'Accumulated Points',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -194,7 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(width: 16),
                     // Promotions text
                     const Text(
-                      'Ưu đãi',
+                      'Promotions',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -225,14 +224,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               
               // Menu items
               const SizedBox(height: 16),
-              _buildMenuItem(Icons.shopping_bag_outlined, 'Lịch sử đơn hàng'),
-              _buildMenuItem(Icons.location_on_outlined, 'Sổ địa chỉ'),
-              _buildMenuItem(Icons.history, 'Lịch sử tích điểm'),
-              _buildMenuItem(Icons.people_outline, 'Giới thiệu bạn bè'),
-              _buildMenuItem(Icons.help_outline, 'Trung tâm hỗ trợ'),
-              _buildMenuItem(Icons.delete_forever, 'Xóa tài khoản'),
+              _buildMenuItem(Icons.shopping_bag_outlined, 'Order History'),
+              _buildMenuItem(Icons.location_on_outlined, 'Address Book'),
+              _buildMenuItem(Icons.history, 'Points History'),
+              _buildMenuItem(Icons.people_outline, 'Refer a Friend'),
+              _buildMenuItem(Icons.help_outline, 'Support Center'),
+              _buildMenuItem(Icons.delete_forever, 'Delete Account'),
               
-              // Thêm nút đăng xuất nếu đã đăng nhập
+              // Add logout button if logged in
               if (isLoggedIn) _buildLogoutButton(),
               
               // App info
@@ -243,7 +242,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Thông tin ứng dụng',
+                      'App Information',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -252,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        const Text('Phiên bản:'),
+                        const Text('Version:'),
                         const Spacer(),
                         Text(
                           '2.3.9',
@@ -263,7 +262,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        const Text('Bản dựng:'),
+                        const Text('Build:'),
                         const Spacer(),
                         Text(
                           '20240621',
@@ -311,11 +310,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Trang chủ',
+            label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.card_giftcard),
-            label: 'Ưu đãi',
+            label: 'Promotions',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.qr_code_scanner),
@@ -323,11 +322,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_bag),
-            label: 'Chi nhánh',
+            label: 'Branch',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Cá nhân',
+            label: 'Profile',
           ),
         ],
       ),
@@ -344,7 +343,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
   
-  // Phương thức xử lý cho menu item
+  // Method to handle menu item
   Widget _buildMenuItem(IconData icon, String title) {
     return ListTile(
       leading: Icon(icon, color: AppColors.primary),
@@ -354,7 +353,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final authService = Provider.of<AuthService>(context, listen: false);
         final isLoggedIn = authService.isAuthenticated;
         
-        if (title == 'Lịch sử đơn hàng') {
+        if (title == 'Order History') {
           if (isLoggedIn) {
             Navigator.push(
               context,
@@ -363,7 +362,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           } else {
             _showLoginRequiredDialog();
           }
-        } else if (title == 'Sổ địa chỉ') {
+        } else if (title == 'Address Book') {
           if (isLoggedIn) {
             Navigator.push(
               context,
@@ -372,7 +371,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           } else {
             _showLoginRequiredDialog();
           }
-        } else if (title == 'Lịch sử tích điểm') {
+        } else if (title == 'Points History') {
           if (isLoggedIn) {
             Navigator.push(
               context,
@@ -381,17 +380,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           } else {
             _showLoginRequiredDialog();
           }
-        } else if (title == 'Giới thiệu bạn bè') {
+        } else if (title == 'Refer a Friend') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const ReferralScreen()),
           );
-        } else if (title == 'Trung tâm hỗ trợ') {
+        } else if (title == 'Support Center') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const SupportCenterScreen()),
           );
-        } else if (title == 'Xóa tài khoản') {
+        } else if (title == 'Delete Account') {
           if (isLoggedIn) {
             Navigator.push(
               context,
@@ -405,7 +404,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
   
-  // Phương thức xây dựng nút đăng xuất
+  // Method to build logout button
   Widget _buildLogoutButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -421,26 +420,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _showLogoutConfirmDialog();
         },
         child: const Text(
-          'Đăng xuất',
+          'Logout',
           style: TextStyle(color: Colors.white, fontSize: 16),
         ),
       ),
     );
   }
   
-  // Hiển thị dialog yêu cầu đăng nhập
+  // Show login required dialog
   void _showLoginRequiredDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(
-            'Thông báo',
+            'Login Required',
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           content: const Text(
-            'Vui lòng đăng nhập để sử dụng tính năng này',
+            'Please login to use this feature',
             textAlign: TextAlign.center,
           ),
           actions: [
@@ -448,7 +447,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Expanded(
                   child: TextButton(
-                    child: const Text('Hủy'),
+                    child: const Text('Cancel'),
                     style: TextButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -463,7 +462,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Expanded(
                   child: TextButton(
                     child: const Text(
-                      'Đăng nhập',
+                      'Login',
                       style: TextStyle(color: Colors.white),
                     ),
                     style: TextButton.styleFrom(
@@ -489,19 +488,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
   
-  // Hiển thị dialog xác nhận đăng xuất
+  // Show logout confirmation dialog
   void _showLogoutConfirmDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(
-            'Xác nhận',
+            'Confirm',
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           content: const Text(
-            'Bạn có chắc chắn muốn đăng xuất?',
+            'Are you sure you want to log out?',
             textAlign: TextAlign.center,
           ),
           actions: [
@@ -509,7 +508,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Expanded(
                   child: TextButton(
-                    child: const Text('Hủy'),
+                    child: const Text('Cancel'),
                     style: TextButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -524,7 +523,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Expanded(
                   child: TextButton(
                     child: const Text(
-                      'Đăng xuất',
+                      'Logout',
                       style: TextStyle(color: Colors.white),
                     ),
                     style: TextButton.styleFrom(
@@ -534,11 +533,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     onPressed: () {
-                      // Đăng xuất
+                      // Logout
                       final authService = Provider.of<AuthService>(context, listen: false);
                       authService.logout();
                       
-                      // Đóng dialog và refresh màn hình
+                      // Close dialog and refresh screen
                       Navigator.of(context).pop();
                       setState(() {});
                     },

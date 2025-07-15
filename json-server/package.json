@@ -1,0 +1,12 @@
+{
+  "name": "hannie-jewelry-api",
+  "version": "1.0.0",
+  "description": "JSON Server API for Hannie Jewelry mobile app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "json-server": "^0.17.3"
+  }
+}

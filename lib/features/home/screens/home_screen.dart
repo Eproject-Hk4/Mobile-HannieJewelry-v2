@@ -50,7 +50,7 @@ class HomeScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 14, color: Colors.white),
                 ),
                 Text(
-                  'Nguyễn Hoàng Thái',
+                  'John Smith',
                   style: AppStyles.bodyText.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -224,7 +224,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Up to 2,500,000đ',
+                          'Up to 2,500,000 VND',
                           style: AppStyles.bodyText,
                         ),
                       ],

@@ -6,6 +6,7 @@ import '../../../core/constants/app_styles.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../home/screens/home_screen.dart';
 import '../services/auth_service.dart';
+import 'otp_verification_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -17,16 +18,12 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -34,19 +31,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Validate input
     final name = _nameController.text.trim();
     final phone = _phoneController.text.trim();
-    final password = _passwordController.text;
-    final confirmPassword = _confirmPasswordController.text;
 
-    if (name.isEmpty || phone.isEmpty || password.isEmpty) {
+    if (name.isEmpty || phone.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all required fields')),
-      );
-      return;
-    }
-
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
       );
       return;
     }
@@ -56,27 +44,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     final authService = Provider.of<AuthService>(context, listen: false);
-    final success = await authService.register(
-      name,
-      phone,
-      password,
-    );
+    
+    // Store the name for later use after OTP verification
+    authService.setRegistrationData(name);
+    
+    // Send OTP to the phone number
+    final success = await authService.sendOTP(phone);
 
     setState(() {
       _isLoading = false;
     });
 
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful!')),
-      );
-      Navigator.pushReplacement(
+      // Navigate to OTP verification screen
+      Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(
+          builder: (context) => const OTPVerificationScreen(isRegistration: true),
+        ),
       );
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration failed. Please try again.')),
+        const SnackBar(content: Text('Failed to send verification code. Please try again.')),
       );
     }
   }
@@ -107,7 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Please fill in the information to register an account',
+                'Please fill in your information to register an account',
                 style: AppStyles.bodyTextSmall,
               ),
               const SizedBox(height: 32),
@@ -129,32 +118,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 keyboardType: TextInputType.phone,
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _confirmPasswordController,
-                decoration: const InputDecoration(
-                  labelText: 'Confirm Password',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock_outline),
-                ),
-                obscureText: true,
-              ),
               const SizedBox(height: 32),
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : CustomButton(
-                text: 'Register',
-                onPressed: _register,
+                      text: 'Continue',
+                      onPressed: _register,
+                    ),
+              const SizedBox(height: 16),
+              Center(
+                child: Text(
+                  'We will send a verification code to your phone number',
+                  style: AppStyles.bodyTextSmall.copyWith(
+                    color: AppColors.textLight,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
               const SizedBox(height: 24),
             ],

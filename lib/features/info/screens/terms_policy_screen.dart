@@ -11,7 +11,7 @@ class TermsPolicyScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Điều khoản & chính sách'),
+        title: const Text('Terms & Policies'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -25,27 +25,27 @@ class TermsPolicyScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'CHÍNH SÁCH BẢO MẬT THÔNG TIN THANH TOÁN',
+                'PAYMENT INFORMATION SECURITY POLICY',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               const Text(
-                '1. Cam kết bảo mật',
+                '1. Security Commitment',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               const Text(
-                '- Hệ thống thanh toán thẻ được cung cấp bởi các đối tác công thanh toán ("Đối Tác Công Toán") đã được cấp phép hoạt động hợp pháp tại Việt Nam. Theo đó, các tiêu chuẩn bảo mật thanh toán thẻ tại App Huy Thanh đảm bảo tuân thủ theo các tiêu chuẩn bảo mật ngành.',
+                '- The card payment system is provided by payment partners ("Payment Partners") that have been legally licensed to operate in Vietnam. Accordingly, card payment security standards at Hannie Jewelry ensure compliance with industry security standards.',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
               const Text(
-                '2. Quy định bảo mật',
+                '2. Security Regulations',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               const Text(
-                '- Chính sách giao dịch thanh toán bằng thẻ quốc tế và thẻ nội địa (internet banking) đảm bảo tuân thủ các tiêu chuẩn bảo mật của các Đối Tác Công Thanh Toán gồm:\n\n• Thông tin tài chính của Khách hàng sẽ được bảo vệ trong suốt quá trình giao dịch bằng giao thức SSL (Secure Sockets Layer).\n\n• Chứng nhận tiêu chuẩn bảo mật dữ liệu thông tin thanh toán (PCI DSS) do Trustwave cung cấp.\n\n• Mật khẩu sử dụng một lần (OTP) được gửi qua SMS để đảm bảo việc truy cập tài khoản được xác thực.\n\n• Tiêu chuẩn mã hóa MD5 128 bit.\n\n• Các nguyên tắc và quy định bảo mật thông tin trong ngành tài chính ngân hàng theo quy định của Ngân hàng nhà nước Việt Nam.',
+                '- Payment transaction policy using international cards and domestic cards (internet banking) ensures compliance with the security standards of Payment Partners including:\n\n• Customer financial information will be protected throughout the transaction process using SSL (Secure Sockets Layer) protocol.\n\n• Payment information data security standard certification (PCI DSS) provided by Trustwave.\n\n• One-time password (OTP) sent via SMS to ensure account access is authenticated.\n\n• MD5 128-bit encryption standard.\n\n• Principles and regulations on information security in the banking and finance industry as regulated by the State Bank of Vietnam.',
                 style: TextStyle(fontSize: 16),
               ),
             ],

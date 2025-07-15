@@ -6,7 +6,7 @@ import '../../info/screens/company_info_screen.dart';
 import '../../info/screens/security_screen.dart';
 import '../../info/screens/service_guide_screen.dart';
 import '../../info/screens/terms_policy_screen.dart';
-import 'promotions_screen.dart'; // Thêm import này
+import 'promotions_screen.dart'; // Add this import
 
 class SupportCenterScreen extends StatelessWidget {
   const SupportCenterScreen({Key? key}) : super(key: key);
@@ -16,7 +16,7 @@ class SupportCenterScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Trung tâm hỗ trợ'),
+        title: const Text('Support Center'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -35,7 +35,7 @@ class SupportCenterScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Yêu cầu sự trợ giúp về các vấn đề',
+                    'Get help with your issues',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -43,7 +43,7 @@ class SupportCenterScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Chọn chủ đề mà bạn đang quan tâm',
+                    'Select a topic you are interested in',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -54,32 +54,32 @@ class SupportCenterScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             _buildSupportItem(
-              'Thông tin công ty',
+              'Company Information',
               Icons.info_outline,
               context,
             ),
             _buildSupportItem(
-              'Hướng dẫn sử dụng dịch vụ',
+              'Service Guide',
               Icons.lightbulb_outline,
               context,
             ),
             _buildSupportItem(
-              'An toàn & bảo mật',
+              'Safety & Security',
               Icons.security_outlined,
               context,
             ),
             _buildSupportItem(
-              'Dành cho người mới bắt đầu',
+              'For Beginners',
               Icons.person_outline,
               context,
             ),
             _buildSupportItem(
-              'Điều khoản & chính sách',
+              'Terms & Policies',
               Icons.description_outlined,
               context,
             ),
             _buildSupportItem(
-              'Ưu đãi',
+              'Promotions',
               Icons.card_giftcard,
               context,
             ),
@@ -90,7 +90,7 @@ class SupportCenterScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Có thể bạn quan tâm',
+                    'You may be interested in',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -99,7 +99,7 @@ class SupportCenterScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Text('TIN TỨC'),
+                      const Text('NEWS'),
                       const Spacer(),
                       Icon(
                         Icons.arrow_forward_ios,
@@ -150,41 +150,41 @@ class SupportCenterScreen extends StatelessWidget {
           color: Colors.grey[600],
         ),
         onTap: () {
-          // Chuyển hướng đến màn hình tương ứng dựa trên tiêu đề
-          if (title == 'Thông tin công ty') {
+          // Navigate to the corresponding screen based on title
+          if (title == 'Company Information') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const CompanyInfoScreen()),
             );
-          } else if (title == 'Hướng dẫn sử dụng dịch vụ') {
+          } else if (title == 'Service Guide') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ServiceGuideScreen()),
             );
-          } else if (title == 'An toàn & bảo mật') {
+          } else if (title == 'Safety & Security') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const SecurityScreen()),
             );
-          } else if (title == 'Dành cho người mới bắt đầu') {
+          } else if (title == 'For Beginners') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const BeginnerGuideScreen()),
             );
-          } else if (title == 'Điều khoản & chính sách') {
+          } else if (title == 'Terms & Policies') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const TermsPolicyScreen()),
             );
-          } else if (title == 'Ưu đãi') {
+          } else if (title == 'Promotions') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const PromotionsScreen()),
             );
           } else {
-            // Hiển thị thông báo cho các mục khác
+            // Show notification for other items
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Chức năng $title đang được phát triển')),
+              SnackBar(content: Text('The $title feature is under development')),
             );
           }
         },

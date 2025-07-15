@@ -60,7 +60,7 @@ class CartScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 16),
                     ),
                     Text(
-                      '${_formatCurrency(cartService.totalAmount)} đ',
+                      _formatCurrency(cartService.totalAmount),
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -100,7 +100,7 @@ class CartScreen extends StatelessWidget {
       }
       result.write(priceString[i]);
     }
-    return result.toString();
+    return '${result.toString()} ₫';
   }
 }
 
@@ -125,9 +125,29 @@ class CartItemWidget extends StatelessWidget {
               height: 80,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  image: AssetImage(cartItem.image),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  cartItem.image,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/placeholder.png',
+                      fit: BoxFit.cover,
+                    );
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded / 
+                              loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -143,9 +163,37 @@ class CartItemWidget extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (cartItem.size != null) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Text(
+                          'Size: ',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            cartItem.size!,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 8),
                   Text(
-                    '${_formatCurrency(cartItem.price)} đ',
+                    _formatCurrency(cartItem.price),
                     style: AppStyles.bodyText.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.bold,
@@ -197,6 +245,6 @@ class CartItemWidget extends StatelessWidget {
       }
       result.write(priceString[i]);
     }
-    return result.toString();
+    return '${result.toString()} ₫';
   }
 }

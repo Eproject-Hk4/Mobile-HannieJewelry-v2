@@ -16,13 +16,13 @@ class AddressBookScreen extends StatefulWidget {
 class _AddressBookScreenState extends State<AddressBookScreen> {
   final List<Map<String, String>> addresses = [
     {
-      'name': 'Nhà riêng',
-      'address': '123 Đường ABC, Quận 1, TP.HCM',
+      'name': 'Home',
+      'address': '123 ABC Street, District 1, HCMC',
       'phone': '0901234567'
     },
     {
-      'name': 'Văn phòng',
-      'address': '456 Đường XYZ, Quận 2, TP.HCM',
+      'name': 'Office',
+      'address': '456 XYZ Street, District 2, HCMC',
       'phone': '0909876543'
     },
   ];
@@ -31,7 +31,7 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sổ địa chỉ'),
+        title: const Text('Address Book'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
@@ -51,7 +51,7 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Bạn chưa có địa chỉ nào',
+                          'You don\'t have any addresses yet',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey.withOpacity(0.8),
@@ -98,15 +98,15 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
                                             ),
                                           );
                                           
-                                          // Xử lý kết quả trả về
+                                          // Handle returned result
                                           if (result != null && result is Map<String, dynamic>) {
                                             if (result.containsKey('delete')) {
-                                              // Xóa địa chỉ
+                                              // Delete address
                                               setState(() {
                                                 addresses.removeAt(index);
                                               });
                                             } else if (result.containsKey('update')) {
-                                              // Cập nhật địa chỉ
+                                              // Update address
                                               setState(() {
                                                 addresses[index] = result['update'] as Map<String, String>;
                                               });
@@ -126,9 +126,9 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
                                 ],
                               ),
                               const SizedBox(height: 8),
-                              Text('Địa chỉ: ${address['address']}'),
+                              Text('Address: ${address['address']}'),
                               const SizedBox(height: 4),
-                              Text('Số điện thoại: ${address['phone']}'),
+                              Text('Phone: ${address['phone']}'),
                             ],
                           ),
                         ),
@@ -139,7 +139,7 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: CustomButton(
-              text: 'Thêm địa chỉ mới',
+              text: 'Add New Address',
               onPressed: () async {
                 final result = await Navigator.push(
                   context,
@@ -148,7 +148,7 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
                   ),
                 );
                 
-                // Nếu có địa chỉ mới được trả về, thêm vào danh sách
+                // If a new address is returned, add it to the list
                 if (result != null && result is Map<String, dynamic>) {
                   setState(() {
                     addresses.add(result as Map<String, String>);

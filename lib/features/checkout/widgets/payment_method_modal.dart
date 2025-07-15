@@ -73,7 +73,7 @@ class _PaymentMethodModalState extends State<PaymentMethodModal> {
                         order: widget.order!,
                         bankName: 'Vietcombank',
                         accountNumber: '1234567890',
-                        accountName: 'HUY THANH CO., LTD',
+                        accountName: 'HANNIE JEWELRY CO., LTD',
                       ),
                     ),
                   );

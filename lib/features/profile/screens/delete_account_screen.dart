@@ -13,7 +13,7 @@ class DeleteAccountScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Xóa tài khoản'),
+        title: const Text('Delete Account'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -33,23 +33,23 @@ class DeleteAccountScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             const Text(
-              'Tài khoản của bạn sẽ bị Xóa vĩnh viễn.',
+              'Your account will be permanently deleted.',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             const Text(
-              'Xóa tài khoản sẽ:',
+              'Deleting your account will:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(
-              '• Xóa thông tin tài khoản, tên và hình đại diện.',
+              '• Delete account information, name, and profile picture.',
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             const Text(
-              '• Không thể khôi phục lại dữ liệu sau khi Xóa tài khoản.',
+              '• Data cannot be recovered after deleting your account.',
               style: TextStyle(fontSize: 16),
             ),
             const Spacer(),
@@ -57,18 +57,18 @@ class DeleteAccountScreen extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Xử lý xóa tài khoản
+                  // Handle account deletion
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: const Text(
-                          'Xác nhận',
+                          'Confirmation',
                           textAlign: TextAlign.center,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         content: const Text(
-                          'Bạn có chắc chắn muốn xóa tài khoản không?',
+                          'Are you sure you want to delete your account?',
                           textAlign: TextAlign.center,
                         ),
                         shape: RoundedRectangleBorder(
@@ -80,7 +80,7 @@ class DeleteAccountScreen extends StatelessWidget {
                               Expanded(
                                 child: TextButton(
                                   child: const Text(
-                                    'Hủy',
+                                    'Cancel',
                                     style: TextStyle(color: Colors.black),
                                   ),
                                   style: TextButton.styleFrom(
@@ -96,7 +96,7 @@ class DeleteAccountScreen extends StatelessWidget {
                               Expanded(
                                 child: TextButton(
                                   child: const Text(
-                                    'Tiếp tục Xóa tài khoản',
+                                    'Continue Delete Account',
                                     style: TextStyle(color: Colors.white),
                                   ),
                                   style: TextButton.styleFrom(
@@ -106,16 +106,16 @@ class DeleteAccountScreen extends StatelessWidget {
                                     ),
                                   ),
                                   onPressed: () {
-                                    // Xử lý xóa tài khoản
+                                    // Handle account deletion
                                     final authService = Provider.of<AuthService>(
                                         context,
                                         listen: false);
-                                    authService.logout(); // Chỉ đăng xuất, không xóa tài khoản
+                                    authService.logout(); // Just logout, not actually deleting account
                                     Navigator.of(context).pop();
                                     Navigator.of(context).pop();
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                          content: Text('Tài khoản đã được xóa')),
+                                          content: Text('Account has been deleted')),
                                     );
                                   },
                                 ),
@@ -136,7 +136,7 @@ class DeleteAccountScreen extends StatelessWidget {
                   ),
                 ),
                 child: const Text(
-                  'Tiếp tục Xóa tài khoản',
+                  'Continue Delete Account',
                   style: TextStyle(fontSize: 16),
                 ),
               ),
@@ -153,7 +153,7 @@ class DeleteAccountScreen extends StatelessWidget {
                   ),
                 ),
                 child: const Text(
-                  'Hủy',
+                  'Cancel',
                   style: TextStyle(fontSize: 16, color: Colors.black),
                 ),
               ),

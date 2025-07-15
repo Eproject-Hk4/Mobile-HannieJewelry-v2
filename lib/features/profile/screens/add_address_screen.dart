@@ -36,7 +36,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Địa chỉ mới'),
+        title: const Text('New Address'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -50,10 +50,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             children: [
               _buildTextField(
                 controller: _nameController,
-                label: 'Họ và tên',
+                label: 'Full Name',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập họ và tên';
+                    return 'Please enter your full name';
                   }
                   return null;
                 },
@@ -61,11 +61,11 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _phoneController,
-                label: 'Số điện thoại',
+                label: 'Phone Number',
                 keyboardType: TextInputType.phone,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập số điện thoại';
+                    return 'Please enter your phone number';
                   }
                   return null;
                 },
@@ -73,10 +73,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _cityController,
-                label: 'Tỉnh/Thành phố',
+                label: 'City/Province',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập tỉnh/thành phố';
+                    return 'Please enter city/province';
                   }
                   return null;
                 },
@@ -84,10 +84,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _districtController,
-                label: 'Quận/Huyện',
+                label: 'District',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập quận/huyện';
+                    return 'Please enter district';
                   }
                   return null;
                 },
@@ -95,10 +95,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _wardController,
-                label: 'Phường/Xã',
+                label: 'Ward',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập phường/xã';
+                    return 'Please enter ward';
                   }
                   return null;
                 },
@@ -106,11 +106,11 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _addressController,
-                label: 'Địa chỉ cụ thể (số nhà, tên tòa nhà, tên đường, tên khu vực)',
+                label: 'Specific Address (house number, building name, street name, area)',
                 maxLines: 3,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập địa chỉ cụ thể';
+                    return 'Please enter specific address';
                   }
                   return null;
                 },
@@ -127,15 +127,15 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     },
                     activeColor: AppColors.primary,
                   ),
-                  const Text('Đặt làm địa chỉ mặc định'),
+                  const Text('Set as default address'),
                 ],
               ),
               const SizedBox(height: 24),
               CustomButton(
-                text: 'Lưu thay đổi',
+                text: 'Save Changes',
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    // Tạo đối tượng địa chỉ mới
+                    // Create new address object
                     final newAddress = {
                       'name': _nameController.text,
                       'phone': _phoneController.text,
@@ -143,7 +143,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                       'isDefault': _isDefault,
                     };
                     
-                    // Trả về địa chỉ mới cho màn hình trước đó
+                    // Return new address to previous screen
                     Navigator.pop(context, newAddress);
                   }
                 },

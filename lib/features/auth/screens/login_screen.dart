@@ -6,7 +6,7 @@ import '../../../core/constants/app_styles.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../home/screens/home_screen.dart';
 import '../services/auth_service.dart';
-import 'phone_input_screen.dart';
+import 'otp_verification_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,44 +18,47 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
     _phoneController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _login() async {
+  Future<void> _sendOTP() async {
+    // Check for valid phone number
+    final phone = _phoneController.text.trim();
+    if (phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your phone number')),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
 
     final authService = Provider.of<AuthService>(context, listen: false);
-    final success = await authService.login(
-      _phoneController.text,
-      _passwordController.text,
-    );
+    final success = await authService.sendOTP(phone);
 
     setState(() {
       _isLoading = false;
     });
 
     if (success && mounted) {
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(
+          builder: (context) => const OTPVerificationScreen(),
+        ),
+      );
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to send OTP. Please try again.')),
       );
     }
-  }
-
-  void _navigateToOtpLogin() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const PhoneInputScreen()),
-    );
   }
 
   void _navigateToRegister() {
@@ -95,37 +98,28 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const Spacer(flex: 2),
               // Login form
+              Text(
+                'Enter your phone number to continue',
+                style: AppStyles.bodyText,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
               TextField(
                 controller: _phoneController,
                 decoration: const InputDecoration(
                   labelText: 'Phone number',
                   border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.phone),
                 ),
                 keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                ),
-                obscureText: true,
               ),
               const SizedBox(height: 32),
               // Login button
               _isLoading
                   ? const CircularProgressIndicator()
                   : CustomButton(
-                text: AppStrings.loginWithPhone,
-                onPressed: _login,
-              ),
-              const SizedBox(height: 16),
-              // OTP Login button
-              CustomButton(
-                text: AppStrings.loginWithOTP,
-                onPressed: _navigateToOtpLogin,
-                isPrimary: false,
+                text: 'Continue with OTP',
+                onPressed: _sendOTP,
               ),
               const SizedBox(height: 16),
               // Register button
@@ -133,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Don’t have an account? ',
+                    "Don't have an account? ",
                     style: AppStyles.bodyTextSmall,
                   ),
                   TextButton(

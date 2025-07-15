@@ -6,6 +6,8 @@ import '../features/auth/services/auth_service.dart';
 import '../features/cart/services/cart_service.dart';
 import '../features/orders/services/order_service.dart';
 import '../features/notifications/services/notification_service.dart';
+import '../features/products/services/product_service.dart';
+import '../core/services/api_service.dart';
 
 class AppProvider {
   static AuthService? _authService;
@@ -23,5 +25,6 @@ class AppProvider {
       update: (context, auth, previous) => OrderService(auth),
     ),
     ChangeNotifierProvider(create: (_) => NotificationService()),
+    ChangeNotifierProvider(create: (_) => ProductService(ApiService())),
   ];
 }

@@ -1,0 +1,297 @@
+{
+  "users": [
+    {
+      "id": "user1",
+      "name": "John Doe",
+      "phone": "0123456789",
+      "email": "john@example.com",
+      "address": "123 Main St, City"
+    },
+    {
+      "id": "user2",
+      "name": "Thai",
+      "phone": "0345807906",
+      "email": "",
+      "address": ""
+    },
+    {
+      "id": "user3",
+      "name": "thai",
+      "phone": "1234",
+      "email": "",
+      "address": ""
+    }
+  ],
+  "verifications": [
+    {
+      "id": "ver1",
+      "phone": "0123456789",
+      "verification_id": "abc123",
+      "otp": "123456",
+      "expires_at": "2025-07-17T01:00:00Z",
+      "verified": false
+    },
+    {
+      "id": "ver2",
+      "phone": "0345807906",
+      "verification_id": "37bb14dc654d4a9c81e4169be84673bc62fee76074b6dd807ff763a29f0e86ce",
+      "otp": "123456",
+      "expires_at": "2025-07-15T20:56:08.354Z",
+      "verified": true
+    },
+    {
+      "id": "ver3",
+      "phone": "1234",
+      "verification_id": "1e938d243344e37c839873ec1599dce7e4ae380bae9d9e28a491714f3e54e771",
+      "otp": "123456",
+      "expires_at": "2025-07-15T21:03:13.010Z",
+      "verified": true
+    }
+  ],
+  "products": [
+    {
+      "id": "p1",
+      "name": "Diamond Ring",
+      "price": 1200000,
+      "description": "Beautiful diamond ring with 18K gold band",
+      "category": "rings",
+      "images": [
+        "assets/images/products/ring1.jpg",
+        "assets/images/products/ring1_detail.jpg"
+      ],
+      "rating": 4.8,
+      "reviews": 24,
+      "inStock": true,
+      "featured": true,
+      "isNew": false,
+      "productType": "diamond",
+      "productGroup": "wedding",
+      "sizes": [
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ]
+    },
+    {
+      "id": "p2",
+      "name": "Pearl Necklace",
+      "price": 850000,
+      "description": "Elegant pearl necklace with silver chain",
+      "category": "necklaces",
+      "images": [
+        "assets/images/products/necklace1.jpg",
+        "assets/images/products/necklace1_detail.jpg"
+      ],
+      "rating": 4.5,
+      "reviews": 18,
+      "inStock": true,
+      "featured": true,
+      "isNew": true,
+      "productType": "pearl",
+      "productGroup": "casual",
+      "sizes": [
+        "40cm",
+        "45cm",
+        "50cm"
+      ]
+    },
+    {
+      "id": "p3",
+      "name": "Gold Earrings",
+      "price": 650000,
+      "description": "Classic gold earrings with small diamonds",
+      "category": "earrings",
+      "images": [
+        "assets/images/products/earring1.jpg",
+        "assets/images/products/earring1_detail.jpg"
+      ],
+      "rating": 4.7,
+      "reviews": 15,
+      "inStock": true,
+      "featured": false,
+      "isNew": true,
+      "productType": "gold",
+      "productGroup": "party",
+      "sizes": [
+        "Small",
+        "Medium",
+        "Large"
+      ]
+    },
+    {
+      "id": "p4",
+      "name": "Silver Bracelet",
+      "price": 450000,
+      "description": "Stylish silver bracelet with charm details",
+      "category": "bracelets",
+      "images": [
+        "assets/images/products/bracelet1.jpg",
+        "assets/images/products/bracelet1_detail.jpg"
+      ],
+      "rating": 4.6,
+      "reviews": 12,
+      "inStock": true,
+      "featured": true,
+      "isNew": false,
+      "productType": "silver",
+      "productGroup": "casual",
+      "sizes": [
+        "16cm",
+        "18cm",
+        "20cm"
+      ]
+    },
+    {
+      "id": "p5",
+      "name": "Luxury Watch",
+      "price": 2500000,
+      "description": "Premium luxury watch with leather strap",
+      "category": "watches",
+      "images": [
+        "assets/images/products/watch1.jpg",
+        "assets/images/products/watch1_detail.jpg"
+      ],
+      "rating": 4.9,
+      "reviews": 30,
+      "inStock": true,
+      "featured": true,
+      "isNew": true,
+      "productType": "luxury",
+      "productGroup": "formal",
+      "sizes": [
+        "38mm",
+        "40mm",
+        "42mm"
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "id": "c1",
+      "name": "Rings",
+      "image": "assets/images/categories/rings.jpg",
+      "count": 24
+    },
+    {
+      "id": "c2",
+      "name": "Necklaces",
+      "image": "assets/images/categories/necklaces.jpg",
+      "count": 18
+    },
+    {
+      "id": "c3",
+      "name": "Earrings",
+      "image": "assets/images/categories/earrings.jpg",
+      "count": 15
+    },
+    {
+      "id": "c4",
+      "name": "Bracelets",
+      "image": "assets/images/categories/bracelets.jpg",
+      "count": 12
+    },
+    {
+      "id": "c5",
+      "name": "Watches",
+      "image": "assets/images/categories/watches.jpg",
+      "count": 8
+    }
+  ],
+  "cart": [
+    {
+      "id": "cart1",
+      "userId": "user1",
+      "items": [
+        {
+          "id": "p1",
+          "name": "Diamond Ring",
+          "price": 1200000,
+          "image": "assets/images/products/ring1.jpg",
+          "quantity": 1,
+          "size": "7"
+        },
+        {
+          "id": "p3",
+          "name": "Gold Earrings",
+          "price": 650000,
+          "image": "assets/images/products/earring1.jpg",
+          "quantity": 2,
+          "size": "Medium"
+        }
+      ]
+    }
+  ],
+  "orders": [
+    {
+      "id": "o1",
+      "userId": "user1",
+      "items": [
+        {
+          "id": "p2",
+          "name": "Pearl Necklace",
+          "price": 850000,
+          "image": "assets/images/products/necklace1.jpg",
+          "quantity": 1,
+          "size": "45cm"
+        }
+      ],
+      "totalAmount": 850000,
+      "status": "delivered",
+      "paymentMethod": "COD",
+      "shippingAddress": "123 Main St, City",
+      "createdAt": "2025-07-10T14:30:00Z",
+      "updatedAt": "2025-07-12T09:15:00Z"
+    },
+    {
+      "id": "o2",
+      "userId": "user1",
+      "items": [
+        {
+          "id": "p4",
+          "name": "Silver Bracelet",
+          "price": 450000,
+          "image": "assets/images/products/bracelet1.jpg",
+          "quantity": 1,
+          "size": "18cm"
+        }
+      ],
+      "totalAmount": 450000,
+      "status": "processing",
+      "paymentMethod": "Credit Card",
+      "shippingAddress": "123 Main St, City",
+      "createdAt": "2025-07-15T11:20:00Z",
+      "updatedAt": "2025-07-15T11:20:00Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "n1",
+      "userId": "user1",
+      "title": "Order Confirmed",
+      "message": "Your order #o2 has been confirmed and is being processed.",
+      "type": "order",
+      "read": false,
+      "createdAt": "2025-07-15T11:25:00Z"
+    },
+    {
+      "id": "n2",
+      "userId": "user1",
+      "title": "Order Delivered",
+      "message": "Your order #o1 has been delivered successfully.",
+      "type": "order",
+      "read": true,
+      "createdAt": "2025-07-12T09:15:00Z"
+    },
+    {
+      "id": "n3",
+      "userId": "user1",
+      "title": "Special Offer",
+      "message": "Get 20% off on all diamond jewelry this week!",
+      "type": "promotion",
+      "read": false,
+      "createdAt": "2025-07-14T08:00:00Z"
+    }
+  ]
+}

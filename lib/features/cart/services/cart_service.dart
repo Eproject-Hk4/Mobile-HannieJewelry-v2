@@ -29,11 +29,12 @@ class CartService extends ChangeNotifier {
   }
 
   // Add product to cart
-  Future<void> addItem(String id, String name, int price, String image) async {
+  Future<void> addItem(String id, String name, int price, String image, {String? size}) async {
     try {
       final response = await _apiService.post('cart/add', {
         'product_id': id,
         'quantity': 1,
+        if (size != null) 'size': size,
       });
 
       if (response['success']) {
@@ -53,6 +54,7 @@ class CartService extends ChangeNotifier {
             name: name,
             price: price,
             image: image,
+            size: size,
           ),
         );
       }

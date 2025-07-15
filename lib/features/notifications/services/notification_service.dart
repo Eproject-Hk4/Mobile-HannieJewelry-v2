@@ -17,30 +17,44 @@ class NotificationService extends ChangeNotifier {
   Future<void> fetchNotifications() async {
     try {
       final response = await _apiService.get('notifications');
-      final List<dynamic> notificationsData = response['notifications'];
+      // The response might be directly a List or contained in the body
+      List<dynamic> notificationsData;
+      
+      if (response is List) {
+        // If response is already a list
+        notificationsData = response;
+      } else if (response is Map && response.containsKey('notifications')) {
+        // If response is a map with 'notifications' key
+        notificationsData = response['notifications'];
+      } else {
+        // If response is a map but doesn't have 'notifications' key
+        // Try to parse the response body directly
+        notificationsData = response as List<dynamic>;
+      }
+      
       _notifications = notificationsData
           .map((notification) => NotificationModel.fromMap(notification))
           .toList();
       notifyListeners();
     } catch (e) {
-      print('Lỗi khi lấy thông báo: $e');
-      // Fallback với dữ liệu mẫu nếu API lỗi
+      print('Error fetching notifications: $e');
+      // Fallback with sample data if API fails
       _initializeNotifications();
     }
   }
 
   void _initializeNotifications() {
-    // Dữ liệu mẫu
+    // Sample data
     _notifications = [
       NotificationModel(
         id: '1',
-        title: 'Khuyến mãi đặc biệt',
-        message: 'Giảm giá 20% cho tất cả sản phẩm nhẫn kim cương từ ngày 15/06 đến 30/06',
+        title: 'Special Promotion',
+        message: '20% discount on all diamond rings from June 15 to June 30',
         timestamp: DateTime.now().subtract(const Duration(hours: 2)),
         type: NotificationType.promotion,
         imageUrl: 'assets/images/placeholder.png',
       ),
-      // Thêm các thông báo mẫu khác nếu cần
+      // Add other sample notifications if needed
     ];
   }
 
@@ -58,8 +72,8 @@ class NotificationService extends ChangeNotifier {
         }
       }
     } catch (e) {
-      print('Lỗi khi đánh dấu đã đọc: $e');
-      // Fallback xử lý offline nếu API lỗi
+      print('Error marking as read: $e');
+      // Offline fallback if API fails
       final index = _notifications.indexWhere((notification) => notification.id == id);
       if (index != -1) {
         _notifications[index] = _notifications[index].copyWith(isRead: true);
@@ -80,8 +94,8 @@ class NotificationService extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Lỗi khi đánh dấu tất cả đã đọc: $e');
-      // Fallback xử lý offline nếu API lỗi
+      print('Error marking all as read: $e');
+      // Offline fallback if API fails
       _notifications = _notifications.map((notification) => 
         notification.copyWith(isRead: true)).toList();
       notifyListeners();
@@ -96,8 +110,8 @@ class NotificationService extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Lỗi khi xóa thông báo: $e');
-      // Fallback xử lý offline nếu API lỗi
+      print('Error deleting notification: $e');
+      // Offline fallback if API fails
       _notifications.removeWhere((notification) => notification.id == id);
       notifyListeners();
     }
@@ -111,8 +125,8 @@ class NotificationService extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Lỗi khi xóa tất cả thông báo: $e');
-      // Fallback xử lý offline nếu API lỗi
+      print('Error clearing all notifications: $e');
+      // Offline fallback if API fails
       _notifications = [];
       notifyListeners();
     }

@@ -27,22 +27,22 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
   void initState() {
     super.initState();
     
-    // Khởi tạo các controller với dữ liệu hiện có
+    // Initialize controllers with existing data
     _nameController = TextEditingController(text: widget.address['name']);
     _phoneController = TextEditingController(text: widget.address['phone']);
     
-    // Phân tích địa chỉ thành các thành phần
+    // Parse address into components
     final addressParts = _parseAddress(widget.address['address'] ?? '');
     _addressController = TextEditingController(text: addressParts['specific']);
     _wardController = TextEditingController(text: addressParts['ward']);
     _districtController = TextEditingController(text: addressParts['district']);
     _cityController = TextEditingController(text: addressParts['city']);
     
-    // Kiểm tra xem địa chỉ có phải là mặc định không
+    // Check if address is default
     _isDefault = widget.address['isDefault'] == 'true';
   }
 
-  // Hàm phân tích địa chỉ thành các thành phần
+  // Function to parse address into components
   Map<String, String> _parseAddress(String fullAddress) {
     final parts = fullAddress.split(', ');
     String specific = '';
@@ -89,7 +89,7 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chỉnh sửa địa chỉ'),
+        title: const Text('Edit Address'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -103,10 +103,10 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
             children: [
               _buildTextField(
                 controller: _nameController,
-                label: 'Họ và tên',
+                label: 'Full Name',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập họ và tên';
+                    return 'Please enter your full name';
                   }
                   return null;
                 },
@@ -114,11 +114,11 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _phoneController,
-                label: 'Số điện thoại',
+                label: 'Phone Number',
                 keyboardType: TextInputType.phone,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập số điện thoại';
+                    return 'Please enter your phone number';
                   }
                   return null;
                 },
@@ -126,10 +126,10 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _cityController,
-                label: 'Tỉnh/Thành phố',
+                label: 'City/Province',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập tỉnh/thành phố';
+                    return 'Please enter city/province';
                   }
                   return null;
                 },
@@ -137,10 +137,10 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _districtController,
-                label: 'Quận/Huyện',
+                label: 'District',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập quận/huyện';
+                    return 'Please enter district';
                   }
                   return null;
                 },
@@ -148,10 +148,10 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _wardController,
-                label: 'Phường/Xã',
+                label: 'Ward',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập phường/xã';
+                    return 'Please enter ward';
                   }
                   return null;
                 },
@@ -159,11 +159,11 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _addressController,
-                label: 'Địa chỉ cụ thể (số nhà, tên tòa nhà, tên đường, tên khu vực)',
+                label: 'Specific Address',
                 maxLines: 3,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập địa chỉ cụ thể';
+                    return 'Please enter specific address';
                   }
                   return null;
                 },
@@ -180,7 +180,7 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
                     },
                     activeColor: AppColors.primary,
                   ),
-                  const Text('Đặt làm địa chỉ mặc định'),
+                  const Text('Set as default address'),
                 ],
               ),
               const SizedBox(height: 24),
@@ -189,30 +189,30 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
                   Expanded(
                     child: TextButton(
                       onPressed: () {
-                        // Hiển thị hộp thoại xác nhận xóa
+                        // Show confirmation dialog for deletion
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: const Text('Xác nhận xóa'),
-                            content: const Text('Bạn có chắc chắn muốn xóa địa chỉ này không?'),
+                            title: const Text('Confirm Deletion'),
+                            content: const Text('Are you sure you want to delete this address?'),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
-                                child: const Text('Hủy'),
+                                child: const Text('Cancel'),
                               ),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.pop(context); // Đóng dialog
-                                  Navigator.pop(context, {'delete': true}); // Trả về yêu cầu xóa
+                                  Navigator.pop(context); // Close dialog
+                                  Navigator.pop(context, {'delete': true}); // Return delete request
                                 },
-                                child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+                                child: const Text('Delete', style: TextStyle(color: Colors.red)),
                               ),
                             ],
                           ),
                         );
                       },
                       child: const Text(
-                        'Xóa',
+                        'Delete',
                         style: TextStyle(color: Colors.red),
                       ),
                     ),
@@ -221,10 +221,10 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
                   Expanded(
                     flex: 2,
                     child: CustomButton(
-                      text: 'Lưu thay đổi',
+                      text: 'Save Changes',
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          // Tạo đối tượng địa chỉ đã cập nhật
+                          // Create updated address object
                           final updatedAddress = {
                             'name': _nameController.text,
                             'phone': _phoneController.text,
@@ -232,7 +232,7 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
                             'isDefault': _isDefault.toString(),
                           };
                           
-                          // Trả về địa chỉ đã cập nhật cho màn hình trước đó
+                          // Return updated address to previous screen
                           Navigator.pop(context, {'update': updatedAddress});
                         }
                       },

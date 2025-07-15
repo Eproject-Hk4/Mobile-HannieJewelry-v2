@@ -12,7 +12,7 @@ class NewsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Tin tức'),
+        title: const Text('News'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -27,26 +27,26 @@ class NewsScreen extends StatelessWidget {
             children: [
               _buildNewsItem(
                 context: context,
-                title: 'ĐẶP "HỘP MƯ" NHẬN ƯU ĐÃI',
-                subtitle: 'Lên tới 2.500.000đ',
+                title: 'OPEN "SURPRISE BOX" FOR SPECIAL OFFERS',
+                subtitle: 'Up to 2,500,000 VND',
                 date: '15/06/2023',
               ),
               _buildNewsItem(
                 context: context,
-                title: 'TRANG SỨC BẠC "TRINH" HÀN QUỐC',
-                subtitle: 'Xu hướng thời trang mới nhất',
+                title: 'KOREAN "PURE" SILVER JEWELRY',
+                subtitle: 'Latest fashion trends',
                 date: '10/06/2023',
               ),
               _buildNewsItem(
                 context: context,
-                title: 'KHUYẾN MÃI MÙA HÈ',
-                subtitle: 'Giảm giá lên đến 50%',
+                title: 'SUMMER PROMOTION',
+                subtitle: 'Discounts up to 50%',
                 date: '05/06/2023',
               ),
               _buildNewsItem(
                 context: context,
-                title: 'BỘ SƯU TẬP MỚI',
-                subtitle: 'Phong cách hiện đại, trẻ trung',
+                title: 'NEW COLLECTION',
+                subtitle: 'Modern and youthful style',
                 date: '01/06/2023',
               ),
             ],
@@ -120,13 +120,13 @@ class NewsScreen extends StatelessWidget {
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Đang tải chi tiết tin tức...'),
+                            content: Text('Loading news details...'),
                             duration: Duration(seconds: 2),
                           ),
                         );
                       },
                       child: Text(
-                        'Xem chi tiết',
+                        'View details',
                         style: AppStyles.bodyTextSmall.copyWith(color: AppColors.primary),
                       ),
                     ),

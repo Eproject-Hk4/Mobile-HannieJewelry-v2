@@ -17,12 +17,12 @@ class _QRScanScreenState extends State<QRScanScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(
-            'Thông báo',
+            'Notification',
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           content: const Text(
-            'Bạn cần đăng nhập để sử dụng chức năng này',
+            'You need to log in to use this feature',
             textAlign: TextAlign.center,
           ),
           shape: RoundedRectangleBorder(
@@ -34,7 +34,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                 Expanded(
                   child: TextButton(
                     child: const Text(
-                      'Hủy',
+                      'Cancel',
                       style: TextStyle(color: Colors.black),
                     ),
                     style: TextButton.styleFrom(
@@ -50,7 +50,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                 Expanded(
                   child: TextButton(
                     child: const Text(
-                      'Xác nhận',
+                      'Confirm',
                       style: TextStyle(color: Colors.white),
                     ),
                     style: TextButton.styleFrom(
@@ -76,7 +76,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Mã tích điểm'),
+        title: const Text('Points Code'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -85,7 +85,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
       ),
       body: Column(
         children: [
-          // Phần thẻ màu hồng với nội dung
+          // Pink card section with content
           Container(
             width: double.infinity,
             height: 300,
@@ -97,10 +97,10 @@ class _QRScanScreenState extends State<QRScanScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Nút "Nhập số điện thoại"
+                // "Enter phone number" button
                 GestureDetector(
                   onTap: () {
-                    // Hiển thị hộp thoại thông báo đăng nhập
+                    // Show login notification dialog
                     _showLoginDialog();
                   },
                   child: Container(
@@ -113,7 +113,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Nhập số điện thoại',
+                          'Enter phone number',
                           style: TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
@@ -132,18 +132,18 @@ class _QRScanScreenState extends State<QRScanScreen> {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'để sử dụng tính năng tích điểm',
+                  'to use the points collection feature',
                   style: TextStyle(color: Colors.black87, fontSize: 16),
                 ),
               ],
             ),
           ),
           
-          // Thông báo ở dưới
+          // Notification at the bottom
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              'Đưa mã này cho nhân viên khi thanh toán',
+              'Show this code to the staff when checking out',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
           ),

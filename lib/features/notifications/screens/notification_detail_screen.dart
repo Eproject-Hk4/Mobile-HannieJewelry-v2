@@ -14,7 +14,7 @@ class NotificationDetailScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Chi tiết thông báo'),
+        title: const Text('Notification Details'),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -57,7 +57,7 @@ class NotificationDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Ngày: ${_formatDate(notification.timestamp)}',
+              'Date: ${_formatDate(notification.timestamp)}',
               style: AppStyles.bodyTextSmall.copyWith(color: Colors.grey),
             ),
           ],

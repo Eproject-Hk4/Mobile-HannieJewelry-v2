@@ -72,7 +72,7 @@ class OrderSuccessScreen extends StatelessWidget {
                     const Divider(),
                     _buildInfoRow(
                       'Total Amount',
-                      '${_formatCurrency(order.totalAmount)} đ',
+                      _formatCurrency(order.totalAmount),
                       valueStyle: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
@@ -167,6 +167,6 @@ class OrderSuccessScreen extends StatelessWidget {
       }
       result.write(priceString[i]);
     }
-    return result.toString();
+    return '${result.toString()} ₫';
   }
 }

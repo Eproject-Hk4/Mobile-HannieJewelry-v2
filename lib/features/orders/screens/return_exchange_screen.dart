@@ -29,7 +29,7 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
   void initState() {
     super.initState();
     if (widget.orderId != null) {
-      // Nếu có orderId được truyền vào, tự động chọn đơn hàng đó
+      // If orderId is provided, automatically select that order
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final orderService = Provider.of<OrderService>(context, listen: false);
         final order = orderService.getOrderById(widget.orderId!);
@@ -47,7 +47,7 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Yêu cầu trả/đổi hàng'),
+        title: const Text('Return/Exchange Request'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -92,13 +92,13 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Chọn đơn hàng',
+          'Select Order',
           style: AppStyles.heading,
         ),
         const SizedBox(height: 8),
         ElevatedButton(
           onPressed: () async {
-            // Chuyển đến màn hình lịch sử đơn hàng để chọn
+            // Navigate to order history screen to select
             final result = await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const OrderHistoryScreen()),
@@ -126,7 +126,7 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
             children: const [
               Icon(Icons.receipt_long),
               SizedBox(width: 8),
-              Text('Chọn từ lịch sử đơn hàng'),
+              Text('Select from Order History'),
             ],
           ),
         ),
@@ -149,7 +149,7 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Đơn hàng #${_selectedOrder!.id}',
+                'Order #${_selectedOrder!.id}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -162,7 +162,7 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
                     _selectedItems = [];
                   });
                 },
-                child: const Text('Thay đổi'),
+                child: const Text('Change'),
               ),
             ],
           ),
@@ -182,7 +182,7 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
                       child: Text(item.name),
                     ),
                     Text(
-                      '${_formatCurrency(item.price * item.quantity)} đ',
+                      '${_formatCurrency(item.price * item.quantity)} VND',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -200,13 +200,13 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Chọn sản phẩm cần trả/đổi',
+          'Select items to return/exchange',
           style: AppStyles.heading,
         ),
         const SizedBox(height: 8),
         ...(_selectedOrder?.items ?? []).map((item) => CheckboxListTile(
               title: Text(item.name),
-              subtitle: Text('${_formatCurrency(item.price)} đ x ${item.quantity}'),
+              subtitle: Text('${_formatCurrency(item.price)} VND x ${item.quantity}'),
               value: _selectedItems.any((selectedItem) => selectedItem.productId == item.productId),
               onChanged: (bool? value) {
                 setState(() {
@@ -231,7 +231,7 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Loại yêu cầu',
+          'Request Type',
           style: AppStyles.heading,
         ),
         const SizedBox(height: 8),
@@ -239,7 +239,7 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
           children: [
             Expanded(
               child: RadioListTile<ReturnExchangeType>(
-                title: const Text('Trả hàng'),
+                title: const Text('Return Item'),
                 value: ReturnExchangeType.return_item,
                 groupValue: _selectedType,
                 onChanged: (ReturnExchangeType? value) {
@@ -253,7 +253,7 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
             ),
             Expanded(
               child: RadioListTile<ReturnExchangeType>(
-                title: const Text('Đổi hàng'),
+                title: const Text('Exchange Item'),
                 value: ReturnExchangeType.exchange_item,
                 groupValue: _selectedType,
                 onChanged: (ReturnExchangeType? value) {
@@ -276,13 +276,13 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Lý do trả/đổi hàng',
+          'Return/Exchange Reason',
           style: AppStyles.heading,
         ),
         const SizedBox(height: 8),
         TextFormField(
           decoration: InputDecoration(
-            hintText: 'Nhập lý do trả/đổi hàng',
+            hintText: 'Enter reason for return/exchange',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -291,7 +291,7 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
           maxLines: 3,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Vui lòng nhập lý do';
+              return 'Please enter a reason';
             }
             return null;
           },
@@ -308,13 +308,13 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Thông tin bổ sung (không bắt buộc)',
+          'Additional Information (optional)',
           style: AppStyles.heading,
         ),
         const SizedBox(height: 8),
         TextFormField(
           decoration: InputDecoration(
-            hintText: 'Nhập thông tin bổ sung',
+            hintText: 'Enter additional information',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -335,18 +335,18 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
       child: ElevatedButton(
         onPressed: () {
           if (_formKey.currentState!.validate() && _selectedOrder != null && _selectedItems.isNotEmpty) {
-            // Xử lý gửi yêu cầu trả/đổi hàng
+            // Process return/exchange request
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Yêu cầu của bạn đã được gửi thành công')),
+              const SnackBar(content: Text('Your request has been submitted successfully')),
             );
             Navigator.of(context).pop();
           } else if (_selectedOrder == null) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Vui lòng chọn đơn hàng')),
+              const SnackBar(content: Text('Please select an order')),
             );
           } else if (_selectedItems.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Vui lòng chọn ít nhất một sản phẩm')),
+              const SnackBar(content: Text('Please select at least one product')),
             );
           }
         },
@@ -354,7 +354,7 @@ class _ReturnExchangeScreenState extends State<ReturnExchangeScreen> {
           backgroundColor: AppColors.primary,
           padding: const EdgeInsets.symmetric(vertical: 16),
         ),
-        child: const Text('Gửi yêu cầu'),
+        child: const Text('Submit Request'),
       ),
     );
   }

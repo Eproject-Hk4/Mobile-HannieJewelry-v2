@@ -11,7 +11,7 @@ class CompanyInfoScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Thông tin công ty'),
+        title: const Text('Company Information'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -25,17 +25,17 @@ class CompanyInfoScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Tên app: Huy Thanh Jewelry',
+                'App name: Hannie Jewelry',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
               const Text(
-                'Email hỗ trợ: cskh@htj.vn',
+                'Support email: support@hannie.com',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
               const Text(
-                'Tên doanh nghiệp: CÔNG TY TNHH VÀNG - BẠC - ĐÁ QUÝ HUY THANH',
+                'Company name: HANNIE JEWELRY CO., LTD',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
@@ -62,7 +62,7 @@ class CompanyInfoScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Địa chỉ: Số 23 ngõ 100 Đội Cấn, Ba Đình, Hà Nội',
+                'Address: 23 Doi Can Street, Ba Dinh District, Hanoi, Vietnam',
                 style: TextStyle(fontSize: 16),
               ),
             ],

@@ -6,6 +6,9 @@ import '../../../core/constants/app_styles.dart';
 import '../../../core/widgets/cart_badge.dart';
 import '../../cart/screens/cart_screen.dart';
 import '../../cart/services/cart_service.dart';
+import '../models/product_model.dart';
+import '../models/product_category_model.dart';
+import '../services/product_service.dart';
 import 'product_detail_screen.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -17,32 +20,69 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final List<String> _categories = ['Lắc Tay', 'Nhẫn Nữ', 'Bông Tai', 'Lắc Chân', 'Bộ Trang Sức PTB', 'Charm Vàng 14K', 'Quà tặng 8/3'];
+  List<ProductCategory> _categories = [];
+  bool _isLoadingCategories = true;
+  String _selectedCategory = '';
   
-  // Biến lưu trữ trạng thái sắp xếp
-  String _sortOption = 'Mới nhất';
-  final List<String> _sortOptions = ['Mới nhất', 'Bán chạy nhất', 'Giá từ thấp đến cao', 'Giá từ cao đến thấp'];
+  // Sort state
+  String _sortOption = 'Newest';
+  final List<String> _sortOptions = ['Newest', 'Best Selling', 'Price Low to High', 'Price High to Low'];
   
-  // Thêm các biến cho bộ lọc
-  final List<String> _productTypes = ['Vàng 18K', 'Vàng 24K', 'Bạc', 'Kim cương'];
-  final Set<String> _selectedProductTypes = {}; // Bỏ 'late'
-  final List<String> _productGroups = ['Quà tặng', 'Sản phẩm mới', 'Bán chạy', 'Khuyến mãi'];
+  // Filter variables
+  final List<String> _productTypes = ['Gold 18K', 'Gold 24K', 'Silver', 'Diamond'];
+  final Set<String> _selectedProductTypes = {};
+  final List<String> _productGroups = ['Gift', 'New Product', 'Best Seller', 'Promotion'];
   final Set<String> _selectedProductGroups = {};
   RangeValues _priceRange = const RangeValues(0, 10000000);
   
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _categories.length, vsync: this);
+    // Use Future.microtask to delay the API call until after the build is complete
+    Future.microtask(() => _loadCategories());
+  }
+
+  Future<void> _loadCategories() async {
+    setState(() {
+      _isLoadingCategories = true;
+    });
+    
+    try {
+      final productService = Provider.of<ProductService>(context, listen: false);
+      // Explicitly call fetchCategories to ensure we get the latest data from the API
+      final categories = await productService.fetchCategories();
+      
+      if (mounted) {
+        setState(() {
+          _categories = categories;
+          _isLoadingCategories = false;
+          if (categories.isNotEmpty) {
+            _selectedCategory = categories[0].name;
+            _tabController = TabController(length: categories.length, vsync: this);
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingCategories = false;
+        });
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading categories: ${e.toString()}')),
+      );
+    }
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    if (_categories.isNotEmpty) {
+      _tabController.dispose();
+    }
     super.dispose();
   }
 
-  // Hiển thị dialog bộ lọc
+  // Show filter dialog
   void _showFilterDialog() {
     showModalBottomSheet(
       context: context,
@@ -74,17 +114,17 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                             onPressed: () => Navigator.pop(context),
                           ),
                           const Text(
-                            'Bộ lọc',
+                            'Filter',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(width: 48), // Để cân đối với nút back
+                          const SizedBox(width: 48), // For balance with back button
                         ],
                       ),
                       const SizedBox(height: 16),
                       
-                      // Khoảng giá
+                      // Price range
                       const Text(
-                        'Khoảng giá (đ)',
+                        'Price Range (USD)',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
@@ -93,7 +133,7 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                           Expanded(
                             child: TextField(
                               decoration: InputDecoration(
-                                hintText: 'Tối thiểu',
+                                hintText: 'Minimum',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide: const BorderSide(color: Colors.grey),
@@ -109,7 +149,7 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                           Expanded(
                             child: TextField(
                               decoration: InputDecoration(
-                                hintText: 'Tối đa',
+                                hintText: 'Maximum',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide: const BorderSide(color: Colors.grey),
@@ -123,18 +163,18 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                       ),
                       const SizedBox(height: 24),
                       
-                      // Thương hiệu
+                      // Brand
                       const Text(
-                        'Thương hiệu',
+                        'Brand',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      const Text('Không có dữ liệu'),
+                      const Text('No data available'),
                       const SizedBox(height: 24),
                       
-                      // Loại sản phẩm
+                      // Product type
                       const Text(
-                        'Loại sản phẩm',
+                        'Product Type',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
@@ -172,7 +212,7 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Xem thêm',
+                              'See more',
                               style: TextStyle(color: AppColors.primary),
                             ),
                             Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 16),
@@ -181,9 +221,9 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                       ),
                       const SizedBox(height: 16),
                       
-                      // Nhóm sản phẩm
+                      // Product group
                       const Text(
-                        'Nhóm sản phẩm',
+                        'Product Group',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
@@ -221,7 +261,7 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Xem thêm',
+                              'See more',
                               style: TextStyle(color: AppColors.primary),
                             ),
                             Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 16),
@@ -230,15 +270,15 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                       ),
                       const SizedBox(height: 24),
                       
-                      // Nút Đặt lại và Áp dụng
+                      // Reset and Apply buttons
                       Row(
                         children: [
                           Expanded(
                             child: OutlinedButton(
                               onPressed: () {
                                 setState(() {
-                                  _selectedProductTypes.clear(); // Thay vì gán []
-                                  _selectedProductGroups.clear(); // Thay vì gán []
+                                  _selectedProductTypes.clear();
+                                  _selectedProductGroups.clear();
                                   _priceRange = const RangeValues(0, 10000000);
                                 });
                               },
@@ -249,16 +289,16 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              child: const Text('Đặt lại', style: TextStyle(color: Colors.black)),
+                              child: const Text('Reset', style: TextStyle(color: Colors.black)),
                             ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
-                                // Áp dụng bộ lọc và đóng dialog
+                                // Apply filter and close dialog
                                 Navigator.pop(context);
-                                // Cập nhật lại danh sách sản phẩm theo bộ lọc
+                                // Update product list based on filter
                                 setState(() {});
                               },
                               style: ElevatedButton.styleFrom(
@@ -268,7 +308,7 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              child: const Text('Áp dụng', style: TextStyle(color: Colors.white)),
+                              child: const Text('Apply', style: TextStyle(color: Colors.white)),
                             ),
                           ),
                         ],
@@ -289,82 +329,96 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Chọn sản phẩm'),
+        title: const Text('Select Products'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        // Trong AppBar actions
         actions: [
-        IconButton(
-        icon: const Icon(Icons.search),
-        onPressed: () {},
-        ),
-        const CartBadge(),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48),
-          child: Container(
-            color: AppColors.primary,
-            child: TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              indicatorColor: Colors.white,
-              tabs: _categories.map((category) => Tab(text: category)).toList(),
-            ),
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {},
           ),
-        ),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.filter_list, size: 18),
-                    label: const Text('Bộ lọc'),
-                    onPressed: _showFilterDialog,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.black54,
-                      side: const BorderSide(color: Colors.black12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+          const CartBadge(),
+        ],
+        bottom: _isLoadingCategories 
+          ? null 
+          : (_categories.isEmpty 
+              ? null 
+              : PreferredSize(
+                  preferredSize: const Size.fromHeight(48),
+                  child: Container(
+                    color: AppColors.primary,
+                    child: TabBar(
+                      controller: _tabController,
+                      isScrollable: true,
+                      indicatorColor: Colors.white,
+                      tabs: _categories.map((category) => Tab(text: category.name)).toList(),
+                      onTap: (index) {
+                        setState(() {
+                          _selectedCategory = _categories[index].name;
+                        });
+                      },
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.sort, size: 18),
-                    label: const Text('Sắp xếp'),
-                    onPressed: _showSortDialog,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.black54,
-                      side: const BorderSide(color: Colors.black12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                )
+            ),
+      ),
+      body: _isLoadingCategories 
+        ? const Center(child: CircularProgressIndicator())
+        : (_categories.isEmpty 
+            ? const Center(child: Text('No categories found'))
+            : Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            icon: const Icon(Icons.filter_list, size: 18),
+                            label: const Text('Filter'),
+                            onPressed: _showFilterDialog,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.black54,
+                              side: const BorderSide(color: Colors.black12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            icon: const Icon(Icons.sort, size: 18),
+                            label: const Text('Sort'),
+                            onPressed: _showSortDialog,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.black54,
+                              side: const BorderSide(color: Colors.black12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: _categories.map((category) => _buildProductGrid(category.name)).toList(),
+                    ),
+                  ),
+                ],
+              )
           ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: _categories.map((category) => _buildProductGrid(category)).toList(),
-            ),
-          ),
-        ],
-      ),
-      // Thêm thanh hiển thị giỏ hàng ở dưới cùng
+      // Bottom cart bar
       bottomNavigationBar: Consumer<CartService>(
         builder: (context, cartService, child) {
-          // Chỉ hiển thị khi giỏ hàng có sản phẩm
+          // Only show when cart has items
           if (cartService.itemCount == 0) {
             return const SizedBox.shrink();
           }
@@ -390,11 +444,11 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '${cartService.itemCount} sản phẩm',
+                      '${cartService.itemCount} products',
                       style: const TextStyle(fontSize: 12),
                     ),
                     Text(
-                      '${_formatCurrency(cartService.totalAmount)} đ',
+                      '${_formatCurrency(cartService.totalAmount)} USD',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -419,7 +473,7 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                     ),
                   ),
                   child: const Text(
-                    'Xem giỏ hàng',
+                    'View Cart',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -432,68 +486,89 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
   }
 
   Widget _buildProductGrid(String category) {
-    // Danh sách sản phẩm mẫu dựa trên danh mục
-    List<Map<String, dynamic>> products = [];
-    
-    if (category == 'Lắc Tay') {
-      products = [
-        {'id': 'LPTB382', 'name': 'Lắc tay LPTB 382', 'price': 8512000, 'image': 'assets/images/placeholder.png'},
-        {'id': 'LPTB381', 'name': 'Lắc tay LPTB 381', 'price': 8653000, 'image': 'assets/images/placeholder.png'},
-        {'id': 'LPTB380', 'name': 'Lắc tay LPTB 380', 'price': 9994000, 'image': 'assets/images/placeholder.png'},
-        {'id': 'LPTB379', 'name': 'Lắc tay LPTB 379', 'price': 8886000, 'image': 'assets/images/placeholder.png'},
-      ];
-    } else {
-      // Thêm sản phẩm mẫu cho các danh mục khác
-      for (int i = 1; i <= 6; i++) {
-        products.add({
-          'id': '${category.substring(0, 3).toUpperCase()}$i',
-          'name': '$category $i',
-          'price': 5000000 + (i * 500000),
-          'image': 'assets/images/placeholder.png'
-        });
-      }
-    }
+    return FutureBuilder<List<Product>>(
+      future: Provider.of<ProductService>(context, listen: false).fetchProductsByCategory(category),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Error loading products: ${snapshot.error}'),
+          );
+        }
+        
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No products found'));
+        }
+        
+        List<Product> products = snapshot.data!;
+        
+        // Apply filters if set
+        if (_selectedProductTypes.isNotEmpty) {
+          products = products.where((product) => 
+            _selectedProductTypes.contains(product.productType)
+          ).toList();
+        }
 
-    // Áp dụng bộ lọc nếu có
-    if (_selectedProductTypes.isNotEmpty) {
-      // Lọc theo loại sản phẩm
-      // Đây chỉ là mô phỏng, trong thực tế cần có thuộc tính type cho mỗi sản phẩm
-    }
+        if (_selectedProductGroups.isNotEmpty) {
+          products = products.where((product) => 
+            _selectedProductGroups.contains(product.productGroup)
+          ).toList();
+        }
 
-    if (_selectedProductGroups.isNotEmpty) {
-      // Lọc theo nhóm sản phẩm
-      // Đây chỉ là mô phỏng, trong thực tế cần có thuộc tính group cho mỗi sản phẩm
-    }
+        // Apply price range filter
+        products = products.where((product) => 
+          product.price >= _priceRange.start && 
+          product.price <= _priceRange.end
+        ).toList();
+        
+        // Apply sorting
+        switch (_sortOption) {
+          case 'Newest':
+            // Assuming newer products have higher IDs or are already sorted by newest
+            break;
+          case 'Best Selling':
+            // This would require a sales count field, for now we'll just use rating as a proxy
+            products.sort((a, b) => b.rating.compareTo(a.rating));
+            break;
+          case 'Price Low to High':
+            products.sort((a, b) => a.price.compareTo(b.price));
+            break;
+          case 'Price High to Low':
+            products.sort((a, b) => b.price.compareTo(a.price));
+            break;
+        }
 
-    // Lọc theo khoảng giá
-    products = products.where((product) => 
-      product['price'] >= _priceRange.start && 
-      product['price'] <= _priceRange.end
-    ).toList();
-
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.75,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-      ),
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        final product = products[index];
-        return _buildProductCard(product);
+        return GridView.builder(
+          padding: const EdgeInsets.all(16),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.75,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+          ),
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            final product = products[index];
+            return _buildProductCard(product);
+          },
+        );
       },
     );
   }
 
-  Widget _buildProductCard(Map<String, dynamic> product) {
+  Widget _buildProductCard(Product product) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailScreen(product: product),
+            builder: (context) => ProductDetailScreen(
+              productId: product.id,
+              product: product,
+            ),
           ),
         );
       },
@@ -503,7 +578,7 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withAlpha(25), // Thay withOpacity bằng withAlpha
+              color: Colors.grey.withAlpha(25),
               spreadRadius: 1,
               blurRadius: 5,
             ),
@@ -512,14 +587,47 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              child: Image.asset(
-                product['image'],
-                width: double.infinity,
-                height: 120,
-                fit: BoxFit.cover,
-              ),
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  child: product.images.isNotEmpty
+                    ? Image.network(
+                        product.images[0],
+                        width: double.infinity,
+                        height: 120,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Image.asset(
+                          'assets/images/placeholder.png',
+                          width: double.infinity,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Image.asset(
+                        'assets/images/placeholder.png',
+                        width: double.infinity,
+                        height: 120,
+                        fit: BoxFit.cover,
+                      ),
+                ),
+                if (product.isNew)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        'NEW',
+                        style: TextStyle(color: Colors.white, fontSize: 10),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -527,27 +635,32 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product['name'],
+                    product.name,
                     style: AppStyles.bodyText,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Row(
+                    children: [
+                      Icon(Icons.star, color: Colors.amber, size: 14),
+                      Text(
+                        ' ${product.rating} (${product.reviews})',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${_formatCurrency(product['price'])} đ',
+                        '${_formatCurrency(product.price)} USD',
                         style: AppStyles.bodyText.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      // Thêm import
-
-
-
-                      
                       Container(
                         width: 28,
                         height: 28,
@@ -559,20 +672,20 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                           padding: EdgeInsets.zero,
                           icon: const Icon(Icons.add, color: Colors.white, size: 18),
                           onPressed: () {
-                            // Thêm sản phẩm vào giỏ hàng
+                            // Add product to cart
                             final cartService = Provider.of<CartService>(context, listen: false);
                             cartService.addItem(
-                              product['id'],
-                              product['name'],
-                              product['price'],
-                              'assets/images/placeholder.png',
+                              product.id,
+                              product.name,
+                              product.price,
+                              product.images.isNotEmpty ? product.images[0] : 'assets/images/placeholder.png',
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Đã thêm ${product["name"]} vào giỏ hàng'),
+                                content: Text('Added ${product.name} to cart'),
                                 duration: const Duration(seconds: 2),
                                 action: SnackBarAction(
-                                  label: 'XEM GIỎ HÀNG',
+                                  label: 'VIEW CART',
                                   onPressed: () {
                                     Navigator.push(
                                       context,
@@ -603,14 +716,14 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
     final result = StringBuffer();
     for (int i = 0; i < priceString.length; i++) {
       if ((priceString.length - i) % 3 == 0 && i > 0) {
-        result.write('.');
+        result.write(',');
       }
       result.write(priceString[i]);
     }
     return result.toString();
   }
 
-  // Hiển thị dialog sắp xếp
+  // Show sort dialog
   void _showSortDialog() {
     showModalBottomSheet(
       context: context,
@@ -634,10 +747,10 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                       onPressed: () => Navigator.pop(context),
                     ),
                     const Text(
-                      'Sắp xếp theo',
+                      'Sort by',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(width: 48), // Để cân đối với nút back
+                    const SizedBox(width: 48), // For balance with back button
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -653,7 +766,7 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                         _sortOption = value!;
                       });
                       Navigator.pop(context);
-                      // Cập nhật lại danh sách sản phẩm theo sắp xếp
+                      // Update product list based on sort
                       this.setState(() {});
                     },
                   );

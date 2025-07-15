@@ -13,7 +13,8 @@ import '../features/notifications/screens/notifications_screen.dart';
 import '../features/info/screens/company_info_screen.dart';
 import '../main.dart';
 import 'app_routes.dart';
-import '../features/checkout/models/order_model.dart'; // Thêm import cho OrderModel
+import '../features/checkout/models/order_model.dart'; // Import for OrderModel
+import '../features/products/models/product_model.dart'; // Import for Product model
 
 class AppPages {
   static const initial = Routes.SPLASH; // Changed INITIAL to initial
@@ -22,7 +23,10 @@ class AppPages {
     Routes.SPLASH: (context) => const SplashScreen(),
     Routes.LOGIN: (context) => const LoginScreen(),
     Routes.HOME: (context) => const HomeScreen(),
-    Routes.PRODUCT_DETAIL: (context) => ProductDetailScreen(product: ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
+    Routes.PRODUCT_DETAIL: (context) => ProductDetailScreen(
+      productId: (ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>)['productId'] as String,
+      product: (ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>)['product'] as Product?,
+    ),
     Routes.CART: (context) => const CartScreen(),
     Routes.CHECKOUT: (context) => const CheckoutScreen(),
     Routes.ORDER_SUCCESS: (context) => OrderSuccessScreen(order: ModalRoute.of(context)!.settings.arguments as OrderModel),

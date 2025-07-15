@@ -13,7 +13,7 @@ class PointsCodeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Mã tích điểm'),
+        title: const Text('Points Code'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -26,20 +26,20 @@ class PointsCodeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Thẻ thành viên với thông tin người dùng và mã QR
+              // Membership card with user information and QR code
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFB4F0D3), // Màu xanh mint nhạt
+                  color: const Color(0xFFB4F0D3), // Light mint green color
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Tên người dùng
+                    // User name
                     const Text(
-                      'Nguyễn Hoàng Thái',
+                      'John Smith',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -48,7 +48,7 @@ class PointsCodeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     
-                    // Hạng thành viên và điểm
+                    // Membership level and points
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -79,7 +79,7 @@ class PointsCodeScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         const Text(
-                          '0 điểm',
+                          '0 points',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.black87,
@@ -91,7 +91,7 @@ class PointsCodeScreen extends StatelessWidget {
                     
                     const SizedBox(height: 16),
                     
-                    // Đường chấm phân cách
+                    // Dotted separator line
                     Row(
                       children: List.generate(
                         30,
@@ -107,7 +107,7 @@ class PointsCodeScreen extends StatelessWidget {
                     
                     const SizedBox(height: 16),
                     
-                    // Mã vạch - Thay thế hình ảnh bằng widget tạo mã vạch
+                    // Barcode - Replace image with barcode widget
                     Container(
                       height: 60,
                       width: double.infinity,
@@ -121,7 +121,7 @@ class PointsCodeScreen extends StatelessWidget {
                     
                     const SizedBox(height: 8),
                     
-                    // Mã số
+                    // Code number
                     const Text(
                       '0 3 4 5 8 0 7 9 0 6',
                       style: TextStyle(
@@ -133,9 +133,9 @@ class PointsCodeScreen extends StatelessWidget {
                     
                     const SizedBox(height: 16),
                     
-                    // Mã QR
+                    // QR Code
                     QrImageView(
-                      data: 'MEMBER-0345807906', // Dữ liệu mã QR
+                      data: 'MEMBER-0345807906', // QR code data
                       version: QrVersions.auto,
                       size: 150.0,
                       backgroundColor: Colors.white,
@@ -146,9 +146,9 @@ class PointsCodeScreen extends StatelessWidget {
               
               const SizedBox(height: 16),
               
-              // Hướng dẫn sử dụng
+              // Usage instructions
               const Text(
-                'Đưa mã này cho nhân viên khi thanh toán',
+                'Show this code to staff when checking out',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.black87,
@@ -163,7 +163,7 @@ class PointsCodeScreen extends StatelessWidget {
   }
 }
 
-// Thêm class này vào cuối file
+// Add this class at the end of the file
 class _BarcodePainter extends CustomPainter {
   final String data;
   
@@ -176,14 +176,14 @@ class _BarcodePainter extends CustomPainter {
       ..strokeWidth = 2
       ..style = PaintingStyle.fill;
     
-    final double barWidth = size.width / (data.length * 7); // Mỗi ký tự có 7 thanh (4 đen, 3 trắng)
+    final double barWidth = size.width / (data.length * 7); // Each character has 7 bars (4 black, 3 white)
     double x = 0;
     
-    // Vẽ mã vạch đơn giản
+    // Draw simple barcode
     for (int i = 0; i < data.length; i++) {
-      final charCode = data.codeUnitAt(i) - 48; // Chuyển từ ký tự số sang số
+      final charCode = data.codeUnitAt(i) - 48; // Convert from character to number
       
-      // Mỗi ký tự được biểu diễn bằng 4 thanh đen và 3 khoảng trắng
+      // Each character is represented by 4 black bars and 3 white spaces
       for (int j = 0; j < 4; j++) {
         final barHeight = size.height - (j % 2 == 0 ? 0 : size.height / 3);
         canvas.drawRect(
@@ -193,7 +193,7 @@ class _BarcodePainter extends CustomPainter {
         x += barWidth * 1.5;
       }
       
-      x += barWidth; // Khoảng trắng giữa các ký tự
+      x += barWidth; // White space between characters
     }
   }
   

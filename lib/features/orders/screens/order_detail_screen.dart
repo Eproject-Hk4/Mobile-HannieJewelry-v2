@@ -137,9 +137,31 @@ class OrderDetailScreen extends StatelessWidget {
                                   height: 60,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
-                                    image: const DecorationImage(
-                                      image: AssetImage('assets/images/placeholder.png'),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      item.imageUrl,
                                       fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Image.asset(
+                                          'assets/images/placeholder.png',
+                                          fit: BoxFit.cover,
+                                          width: 60,
+                                          height: 60,
+                                        );
+                                      },
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            value: loadingProgress.expectedTotalBytes != null
+                                                ? loadingProgress.cumulativeBytesLoaded / 
+                                                  loadingProgress.expectedTotalBytes!
+                                                : null,
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
                                 ),
@@ -155,7 +177,7 @@ class OrderDetailScreen extends StatelessWidget {
                                         ),
                                       ),
                                       Text(
-                                        '${_formatCurrency(item.price)} đ x ${item.quantity}',
+                                        '${_formatCurrency(item.price)} × ${item.quantity}',
                                         style: TextStyle(
                                           color: Colors.grey[600],
                                           fontSize: 14,
@@ -165,7 +187,7 @@ class OrderDetailScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  '${_formatCurrency(item.price * item.quantity)} đ',
+                                  _formatCurrency(item.price * item.quantity),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -175,11 +197,11 @@ class OrderDetailScreen extends StatelessWidget {
                           )),
                       
                       const Divider(),
-                      _buildInfoRow('Subtotal', '${_formatCurrency(order.totalAmount - order.shippingFee)} đ'),
-                      _buildInfoRow('Shipping Fee', '${_formatCurrency(order.shippingFee)} đ'),
+                      _buildInfoRow('Subtotal', _formatCurrency(order.totalAmount - order.shippingFee)),
+                      _buildInfoRow('Shipping Fee', _formatCurrency(order.shippingFee)),
                       _buildInfoRow(
                         'Total',
-                        '${_formatCurrency(order.totalAmount)} đ',
+                        _formatCurrency(order.totalAmount),
                         valueStyle: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
@@ -263,6 +285,6 @@ class OrderDetailScreen extends StatelessWidget {
       }
       result.write(priceString[i]);
     }
-    return result.toString();
+    return '${result.toString()} ₫';
   }
 }

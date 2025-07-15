@@ -11,7 +11,7 @@ class MyOffersScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Ưu đãi của tôi'),
+        title: const Text('My Offers'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -25,7 +25,7 @@ class MyOffersScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Ưu đãi hiện có',
+                'Available Offers',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 16),
@@ -38,7 +38,7 @@ class MyOffersScreen extends StatelessWidget {
   }
 
   Widget _buildOffersList() {
-    // Giả lập danh sách trống
+    // Simulating empty list
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -50,14 +50,14 @@ class MyOffersScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Không có ưu đãi nào',
+            'No offers available',
             style: AppStyles.bodyText.copyWith(color: Colors.grey),
           ),
         ],
       ),
     );
 
-    // Khi có dữ liệu, bạn có thể sử dụng mã sau:
+    // When there is data, you can use the following code:
     /*
     return ListView.builder(
       shrinkWrap: true,
@@ -80,7 +80,7 @@ class MyOffersScreen extends StatelessWidget {
                 ),
                 child: const Center(
                   child: Text(
-                    'GIẢM 15%',
+                    '15% OFF',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -95,7 +95,7 @@ class MyOffersScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Giảm 15% cho đơn hàng đầu tiên',
+                      '15% off your first order',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -103,7 +103,7 @@ class MyOffersScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Hạn sử dụng: 31/12/2023',
+                      'Valid until: 12/31/2023',
                       style: AppStyles.bodyText.copyWith(
                         color: Colors.grey,
                       ),
@@ -115,7 +115,7 @@ class MyOffersScreen extends StatelessWidget {
                         backgroundColor: AppColors.primary,
                         minimumSize: const Size(double.infinity, 40),
                       ),
-                      child: const Text('Sử dụng ngay'),
+                      child: const Text('Use Now'),
                     ),
                   ],
                 ),

@@ -9,9 +9,9 @@ import 'points_code_screen.dart';
 class MemberScreen extends StatefulWidget {
   const MemberScreen({Key? key}) : super(key: key);
 
-  // Biến để lưu trữ hạng thành viên đang được chọn
+  // Variable to store the currently selected membership level
   static const int MEMBER = 0;
-  static const int THAN_THIET = 1;
+  static const int LOYAL = 1;
   static const int GOLD = 2;
   static const int PLATINUM = 3;
 
@@ -20,14 +20,14 @@ class MemberScreen extends StatefulWidget {
 }
 
 class _MemberScreenState extends State<MemberScreen> {
-  int _selectedLevel = MemberScreen.MEMBER; // Mặc định hiển thị hạng Member
+  int _selectedLevel = MemberScreen.MEMBER; // Default display Member level
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('Hạng thành viên'),
+        title: const Text('Membership Level'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -38,7 +38,7 @@ class _MemberScreenState extends State<MemberScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Thẻ thành viên
+            // Membership card
             Container(
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(24),
@@ -73,7 +73,7 @@ class _MemberScreenState extends State<MemberScreen> {
                       ),
                       const Spacer(),
                       Text(
-                        '0 điểm',
+                        '0 points',
                         style: AppStyles.heading.copyWith(color: Colors.white),
                       ),
                     ],
@@ -102,7 +102,7 @@ class _MemberScreenState extends State<MemberScreen> {
                         ),
                         const SizedBox(width: 8),
                         const Text(
-                          'Còn 1 điểm nữa để lên Thành viên Thân thiết',
+                          'Need 1 more point to reach Loyal Member',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.white,
@@ -113,7 +113,7 @@ class _MemberScreenState extends State<MemberScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Trong phần thẻ thành viên, thêm nút để hiển thị mã tích điểm
+                  // In the membership card section, add a button to display points code
                   Center(
                     child: ElevatedButton.icon(
                       onPressed: () {
@@ -122,7 +122,7 @@ class _MemberScreenState extends State<MemberScreen> {
                         );
                       },
                       icon: const Icon(Icons.qr_code, color: Color(0xFF7EDDB6)),
-                      label: const Text('Hiển thị mã tích điểm'),
+                      label: const Text('Show Points Code'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black87,
@@ -134,26 +134,26 @@ class _MemberScreenState extends State<MemberScreen> {
               ),
             ),
             
-            // Lịch sử tích điểm
+            // Points history
             _buildMenuItem(
               context,
-              'Lịch sử tích điểm',
+              'Points History',
               Icons.history,
               () {
-                // Điều hướng đến màn hình lịch sử tích điểm
+                // Navigate to points history screen
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const PointsHistoryScreen()),
                 );
               },
             ),
             
-            // Ưu đãi của tôi
+            // My offers
             _buildMenuItem(
               context,
-              'Ưu đãi của tôi',
+              'My Offers',
               Icons.card_giftcard,
               () {
-                // Điều hướng đến màn hình ưu đãi
+                // Navigate to offers screen
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const MyOffersScreen()),
                 );
@@ -162,7 +162,7 @@ class _MemberScreenState extends State<MemberScreen> {
             
             const SizedBox(height: 24),
             
-            // Các hạng thành viên
+            // Membership levels
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -184,14 +184,14 @@ class _MemberScreenState extends State<MemberScreen> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        _selectedLevel = MemberScreen.THAN_THIET;
+                        _selectedLevel = MemberScreen.LOYAL;
                       });
                     },
                     child: _buildMembershipLevel(
-                      'Thân thiết', 
+                      'Loyal', 
                       Icons.person, 
                       Colors.grey, 
-                      _selectedLevel == MemberScreen.THAN_THIET
+                      _selectedLevel == MemberScreen.LOYAL
                     ),
                   ),
                   GestureDetector(
@@ -226,7 +226,7 @@ class _MemberScreenState extends State<MemberScreen> {
             
             const SizedBox(height: 24),
             
-            // Quy tắc tích điểm và quyền lợi theo hạng thành viên
+            // Points accumulation rules and benefits by membership level
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -242,49 +242,49 @@ class _MemberScreenState extends State<MemberScreen> {
     );
   }
 
-  // Trả về danh sách quyền lợi dựa trên hạng thành viên được chọn
+  // Return list of benefits based on selected membership level
   List<Widget> _getBenefitsByLevel(int level) {
     switch (level) {
-      case MemberScreen.THAN_THIET:
+      case MemberScreen.LOYAL:
         return [
-          _buildBenefitItem('Quy tắc tích điểm: 10% giá trị đơn hàng'),
+          _buildBenefitItem('Points rule: 10% of order value'),
           const SizedBox(height: 12),
-          _buildBenefitItem('Hạng thẻ Thân Thiết: Từ 1 - 1.999.999 điểm'),
+          _buildBenefitItem('Loyal Member level: From 1 - 1,999,999 points'),
           const SizedBox(height: 12),
-          _buildBenefitItem('Miễn phí vận chuyển'),
+          _buildBenefitItem('Free shipping'),
           const SizedBox(height: 12),
-          _buildBenefitItem('Tặng 01 mã ưu đãi 15% sử dụng trong tháng sinh nhật'),
+          _buildBenefitItem('One 15% discount code for use during birthday month'),
         ];
       case MemberScreen.GOLD:
         return [
-          _buildBenefitItem('Quy tắc tích điểm: 10% giá trị đơn hàng'),
+          _buildBenefitItem('Points rule: 10% of order value'),
           const SizedBox(height: 12),
-          _buildBenefitItem('Hạng thẻ Gold: Từ 2.000.000 - 9.999.999 điểm'),
+          _buildBenefitItem('Gold level: From 2,000,000 - 9,999,999 points'),
           const SizedBox(height: 12),
-          _buildBenefitItem('Miễn phí vận chuyển'),
+          _buildBenefitItem('Free shipping'),
           const SizedBox(height: 12),
-          _buildBenefitItem('Tặng 01 mã ưu đãi 15% sử dụng trong tháng sinh nhật'),
+          _buildBenefitItem('One 15% discount code for use during birthday month'),
         ];
       case MemberScreen.PLATINUM:
         return [
-          _buildBenefitItem('Quy tắc tích điểm: 10% giá trị đơn hàng'),
+          _buildBenefitItem('Points rule: 10% of order value'),
           const SizedBox(height: 12),
-          _buildBenefitItem('Hạng thẻ Platinum: Từ 10.000.000 điểm'),
+          _buildBenefitItem('Platinum level: From 10,000,000 points'),
           const SizedBox(height: 12),
-          _buildBenefitItem('Miễn phí vận chuyển'),
+          _buildBenefitItem('Free shipping'),
           const SizedBox(height: 12),
-          _buildBenefitItem('Quy trình chăm sóc khách hàng ưu tiên'),
+          _buildBenefitItem('Priority customer care process'),
           const SizedBox(height: 12),
-          _buildBenefitItem('Tặng 01 mã ưu đãi 15% sử dụng trong tháng sinh nhật'),
+          _buildBenefitItem('One 15% discount code for use during birthday month'),
         ];
       case MemberScreen.MEMBER:
       default:
         return [
-          _buildBenefitItem('Quy tắc tích điểm: 10% giá trị đơn hàng'),
+          _buildBenefitItem('Points rule: 10% of order value'),
           const SizedBox(height: 12),
-          _buildBenefitItem('Miễn phí vận chuyển'),
+          _buildBenefitItem('Free shipping'),
           const SizedBox(height: 12),
-          _buildBenefitItem('Tặng 01 mã ưu đãi 5% sử dụng trong tháng sinh nhật'),
+          _buildBenefitItem('One 5% discount code for use during birthday month'),
         ];
     }
   }

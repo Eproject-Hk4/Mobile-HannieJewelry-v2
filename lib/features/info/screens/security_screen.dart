@@ -11,7 +11,7 @@ class SecurityScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        title: const Text('An toàn & bảo mật'),
+        title: const Text('Safety & Security'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -25,42 +25,42 @@ class SecurityScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                '1. Mục đích và phạm vi thu thập thông tin',
+                '1. Purpose and Scope of Information Collection',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               const Text(
-                'App Huy Thanh không bán, chia sẻ hay trao đổi thông tin cá nhân của khách hàng thu thập trên trang web cho một bên thứ ba nào khác.',
+                'Hannie Jewelry app does not sell, share or exchange customers\' personal information collected on the website with any third party.',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Thông tin cá nhân thu thập được sẽ chỉ được sử dụng để công ty cung cấp sản phẩm, dịch vụ đến khách hàng.',
+                'The personal information collected will only be used by the company to provide products and services to customers.',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Khi bạn liên hệ đăng ký nhận thông tin, chat với nhân viên, gửi bình luận và thực hiện nhập thông tin để mua hàng, thông tin cá nhân mà App Huy Thanh thu thập bao gồm: Họ và tên, Địa chỉ, Điện thoại, Email...',
+                'When you register to receive information, chat with staff, submit comments, and enter information to make purchases, the personal information that Hannie Jewelry app collects includes: Full name, Address, Phone number, Email...',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Ngoài thông tin cá nhân là các thông tin về dịch vụ: Tên sản phẩm, Số lượng, Thời gian giao nhận sản phẩm...',
+                'In addition to personal information, there is service information: Product name, Quantity, Product delivery time...',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
               const Text(
-                '2. Phạm vi sử dụng thông tin',
+                '2. Scope of Information Use',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               const Text(
-                'Thông tin cá nhân thu thập được sẽ chỉ được App Huy Thanh sử dụng trong nội bộ công ty và cho một hoặc tất cả các mục đích sau đây:',
+                'Personal information collected will only be used by Hannie Jewelry app within the company and for one or all of the following purposes:',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
               const Text(
-                '- Hỗ trợ khách hàng\n- Cung cấp thông tin liên quan đến dịch vụ\n- Xử lý đơn đặt hàng và cung cấp dịch vụ và thông tin qua trang web của chúng tôi theo yêu cầu của bạn\n- Chúng tôi có thể sẽ gửi thông tin sản phẩm, dịch vụ mới, thông tin về các sự kiện sắp tới hoặc thông tin tuyển dụng nếu Quý khách đăng ký nhận email thông báo.',
+                '- Customer support\n- Providing information related to services\n- Processing orders and providing services and information through our website as requested by you\n- We may send information about new products, services, information about upcoming events or recruitment information if you register to receive email notifications.',
                 style: TextStyle(fontSize: 16),
               ),
             ],

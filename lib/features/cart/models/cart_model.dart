@@ -3,6 +3,7 @@ class CartItem {
   final String name;
   final int price;
   final String image;
+  final String? size;
   int quantity;
 
   CartItem({
@@ -10,6 +11,7 @@ class CartItem {
     required this.name,
     required this.price,
     required this.image,
+    this.size,
     this.quantity = 1,
   });
 
@@ -19,6 +21,7 @@ class CartItem {
       'name': name,
       'price': price,
       'image': image,
+      'size': size,
       'quantity': quantity,
     };
   }
@@ -29,6 +32,7 @@ class CartItem {
       name: map['name'],
       price: map['price'],
       image: map['image'] ?? 'assets/images/placeholder.png',
+      size: map['size'],
       quantity: map['quantity'] ?? 1,
     );
   }

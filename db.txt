@@ -1,0 +1,188 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Nguyễn Văn A",
+      "phone": "0901234567"
+    },
+    {
+      "id": "2",
+      "name": "Trần Thị B",
+      "phone": "0909876543"
+    },
+    {
+      "name": "Test User",
+      "phone": "0987654321",
+      "password": "password123",
+      "id": "TnKB00V"
+    },
+    {
+      "name": "Test User",
+      "phone": "0987654321",
+      "password": "password123",
+      "id": "sndKmyo"
+    },
+    {
+      "name": "Test User",
+      "phone": "0987654321",
+      "password": "password123",
+      "id": "QGEYDqx"
+    },
+    {
+      "name": "Test User",
+      "phone": "0987654321",
+      "password": "password123",
+      "id": "Dw6u5xL"
+    },
+    {
+      "id": "48c8",
+      "name": "thai",
+      "phone": "123",
+      "password": "123"
+    },
+    {
+      "id": "9b9a",
+      "phone": "123",
+      "password": "123"
+    },
+    {
+      "id": "d48b",
+      "phone": "123",
+      "password": "123"
+    },
+    {
+      "id": "d75b",
+      "phone": "123",
+      "password": "123"
+    },
+    {
+      "id": "079b",
+      "phone": "123",
+      "password": "123"
+    },
+    {
+      "id": "a6c6",
+      "phone": "123",
+      "password": "123"
+    },
+    {
+      "id": "50c6",
+      "phone": "123",
+      "password": "123"
+    },
+    {
+      "id": "5171",
+      "phone": "123",
+      "password": "123"
+    },
+    {
+      "id": "c119",
+      "phone": "123",
+      "password": "123"
+    },
+    {
+      "id": "2fae",
+      "name": "thai",
+      "phone": "123",
+      "password": "123"
+    }
+  ],
+  "categories": [
+    {
+      "id": "1",
+      "name": "Rings",
+      "image": "https://example.com/images/category-rings.jpg"
+    },
+    {
+      "id": "2",
+      "name": "Necklaces",
+      "image": "https://example.com/images/category-necklaces.jpg"
+    },
+    {
+      "id": "3",
+      "name": "Earrings",
+      "image": "https://example.com/images/category-earrings.jpg"
+    },
+    {
+      "id": "4",
+      "name": "Bracelets",
+      "image": "https://example.com/images/category-bracelets.jpg"
+    }
+  ],
+  "products": [
+    {
+      "id": "1",
+      "name": "Diamond Ring",
+      "description": "Beautiful diamond ring with 18K gold band",
+      "price": 5000000,
+      "images": [
+        "https://example.com/images/diamond-ring-1.jpg",
+        "https://example.com/images/diamond-ring-2.jpg"
+      ],
+      "category": "rings",
+      "rating": 4.8,
+      "featured": true,
+      "isNew": true,
+      "sizes": ["5", "6", "7", "8", "9"]
+    },
+    {
+      "id": "2",
+      "name": "Gold Necklace",
+      "description": "Elegant gold necklace with pendant",
+      "price": 3500000,
+      "images": [
+        "https://example.com/images/gold-necklace-1.jpg"
+      ],
+      "category": "necklaces",
+      "rating": 4.5,
+      "featured": true,
+      "isNew": false,
+      "sizes": ["40cm", "45cm", "50cm"]
+    }
+  ],
+  "cart": [
+    {
+      "id": "1",
+      "user_id": "1",
+      "items": [
+        {
+          "id": "LPTB382",
+          "name": "Lắc tay LPTB 382",
+          "price": 8512000,
+          "image": "assets/images/placeholder.png",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "user_id": "2",
+      "items": []
+    }
+  ],
+  "orders": [
+    {
+      "id": "ORD001",
+      "user_id": "1",
+      "items": [
+        {
+          "product_id": "LPTB382",
+          "name": "Lắc tay LPTB 382",
+          "image_url": "assets/images/placeholder.png",
+          "price": 8512000,
+          "quantity": 1
+        }
+      ],
+      "total_amount": 8512000,
+      "shipping_fee": 30000,
+      "delivery_method": "delivery",
+      "payment_method": "cod",
+      "recipient_name": "Nguyễn Văn A",
+      "recipient_phone": "0901234567",
+      "recipient_address": "123 ABC Street, District 1, HCMC",
+      "note": "Gọi trước khi giao",
+      "status": "delivered",
+      "created_at": "2023-06-15T10:30:00Z"
+    }
+  ]
+}

@@ -36,24 +36,24 @@ class ApiService {
 
   Future<dynamic> post(String endpoint, dynamic data) async {
     final url = Uri.parse('${AppConfig.apiBaseUrl}${endpoint.startsWith('/') ? endpoint : '/$endpoint'}');
-    print('Calling API POST: $url with data: $data'); // Thêm log này
+    print('Calling API POST: $url with data: $data'); // Add this log
     try {
       final response = await http.post(
         url,
         headers: _headers,
         body: json.encode(data),
       ).timeout(Duration(milliseconds: AppConfig.connectTimeout));
-      print('API Response: ${response.statusCode} - ${response.body}'); // Thêm log này
+      print('API Response: ${response.statusCode} - ${response.body}'); // Add this log
       return _processResponse(response);
     } catch (e) {
-      print('API Error detail: $e'); // Thêm log chi tiết hơn
+      print('API Error detail: $e'); // Add more detailed log
       _handleError(e);
       rethrow;
     }
   }
 
   void _handleError(dynamic error) {
-    print('API Error detail: $error'); // Thêm log chi tiết hơn
+    print('API Error detail: $error'); // Add more detailed log
     if (kDebugMode) {
       print('API Error: $error');
     }
@@ -67,10 +67,10 @@ class ApiService {
         headers: _headers,
         body: json.encode(data),
       ).timeout(Duration(milliseconds: AppConfig.connectTimeout));
-      print('API Response: ${response.statusCode} - ${response.body}'); // Thêm log
+      print('API Response: ${response.statusCode} - ${response.body}'); // Add log
       return _processResponse(response);
     } catch (e) {
-      print('API Error detail: $e'); // Thêm log chi tiết
+      print('API Error detail: $e'); // Add detailed log
       _handleError(e);
       rethrow;
     }
@@ -81,10 +81,10 @@ class ApiService {
     try {
       final response = await http.delete(url, headers: _headers)
           .timeout(Duration(milliseconds: AppConfig.connectTimeout));
-      print('API Response: ${response.statusCode} - ${response.body}'); // Thêm log
+      print('API Response: ${response.statusCode} - ${response.body}'); // Add log
       return _processResponse(response);
     } catch (e) {
-      print('API Error detail: $e'); // Thêm log chi tiết
+      print('API Error detail: $e'); // Add detailed log
       _handleError(e);
       rethrow;
     }
@@ -125,6 +125,4 @@ class ApiService {
         }
     }
   }
-
-
 }
