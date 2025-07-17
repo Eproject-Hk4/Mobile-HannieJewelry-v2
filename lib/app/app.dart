@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../core/constants/app_colors.dart';
 import '../routes/app_pages.dart';
+import '../routes/app_routes.dart';
 import 'app_provider.dart';
 
 class App extends StatelessWidget {
@@ -20,8 +21,8 @@ class App extends StatelessWidget {
           useMaterial3: true,
           fontFamily: 'Montserrat',
         ),
-        initialRoute: AppPages.initial, // Thay đổi từ INITIAL sang initial
-        routes: AppPages.routes,
+        initialRoute: AppPages.initial,
+        onGenerateRoute: AppPages.onGenerateRoute,
       ),
     );
   }

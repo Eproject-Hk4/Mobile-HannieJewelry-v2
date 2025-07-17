@@ -17,11 +17,9 @@ class CartScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
         title: const Text('Your Cart'),
-        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -61,7 +59,7 @@ class CartScreen extends StatelessWidget {
                     ),
                     Text(
                       _formatCurrency(cartService.totalAmount),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
@@ -91,8 +89,8 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  String _formatCurrency(int price) {
-    String priceString = price.toString();
+  String _formatCurrency(double price) {
+    String priceString = price.toStringAsFixed(0);
     final result = StringBuffer();
     for (int i = 0; i < priceString.length; i++) {
       if ((priceString.length - i) % 3 == 0 && i > 0) {
@@ -100,7 +98,7 @@ class CartScreen extends StatelessWidget {
       }
       result.write(priceString[i]);
     }
-    return '${result.toString()} ₫';
+    return '${result.toString()} VND';
   }
 }
 
@@ -132,9 +130,11 @@ class CartItemWidget extends StatelessWidget {
                   cartItem.image,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      'assets/images/placeholder.png',
-                      fit: BoxFit.cover,
+                    return Container(
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: Icon(Icons.image_not_supported, size: 40),
+                      ),
                     );
                   },
                   loadingBuilder: (context, child, loadingProgress) {
@@ -159,16 +159,19 @@ class CartItemWidget extends StatelessWidget {
                 children: [
                   Text(
                     cartItem.name,
-                    style: AppStyles.bodyText,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (cartItem.size != null) ...[
+                  if (cartItem.variant != null) ...[
                     const SizedBox(height: 4),
                     Row(
                       children: [
                         const Text(
-                          'Size: ',
+                          'Variant: ',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
@@ -181,7 +184,7 @@ class CartItemWidget extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            cartItem.size!,
+                            cartItem.variant!,
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -194,9 +197,10 @@ class CartItemWidget extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     _formatCurrency(cartItem.price),
-                    style: AppStyles.bodyText.copyWith(
+                    style: TextStyle(
                       color: AppColors.primary,
                       fontWeight: FontWeight.bold,
+                      fontSize: 14,
                     ),
                   ),
                 ],
@@ -208,7 +212,11 @@ class CartItemWidget extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.remove, size: 20),
                   onPressed: () {
-                    cartService.updateQuantity(cartItem.id, cartItem.quantity - 1);
+                    cartService.updateQuantity(
+                      cartItem.id, 
+                      cartItem.quantity - 1,
+                      variant: cartItem.variant,
+                    );
                   },
                 ),
                 Text(
@@ -218,7 +226,11 @@ class CartItemWidget extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.add, size: 20),
                   onPressed: () {
-                    cartService.updateQuantity(cartItem.id, cartItem.quantity + 1);
+                    cartService.updateQuantity(
+                      cartItem.id, 
+                      cartItem.quantity + 1,
+                      variant: cartItem.variant,
+                    );
                   },
                 ),
               ],
@@ -227,7 +239,10 @@ class CartItemWidget extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.delete_outline, color: Colors.red),
               onPressed: () {
-                cartService.removeItem(cartItem.id);
+                cartService.removeItem(
+                  cartItem.id,
+                  variant: cartItem.variant,
+                );
               },
             ),
           ],
@@ -236,8 +251,8 @@ class CartItemWidget extends StatelessWidget {
     );
   }
 
-  String _formatCurrency(int price) {
-    String priceString = price.toString();
+  String _formatCurrency(double price) {
+    String priceString = price.toStringAsFixed(0);
     final result = StringBuffer();
     for (int i = 0; i < priceString.length; i++) {
       if ((priceString.length - i) % 3 == 0 && i > 0) {
@@ -245,6 +260,6 @@ class CartItemWidget extends StatelessWidget {
       }
       result.write(priceString[i]);
     }
-    return '${result.toString()} ₫';
+    return '${result.toString()} VND';
   }
 }

@@ -12,41 +12,47 @@ class CartService extends ChangeNotifier {
     return _items.fold(0, (sum, item) => sum + item.quantity);
   }
 
-  int get totalAmount {
-    return _items.fold(0, (sum, item) => sum + (item.price * item.quantity));
+  double get totalAmount {
+    return _items.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
   }
 
   // Fetch cart from API
   Future<void> fetchCart() async {
     try {
-      final response = await _apiService.get('cart');
-      final List<dynamic> cartData = response['items'];
-      _items = cartData.map((item) => CartItem.fromMap(item)).toList();
-      notifyListeners();
+      final response = await _apiService.get('/api/cart');
+      
+      if (response['code'] == 200 && response['data'] != null) {
+        final List<dynamic> cartData = response['data']['items'] ?? [];
+        _items = cartData.map((item) => CartItem.fromMap(item)).toList();
+        notifyListeners();
+      } else {
+        print('Error fetching cart: ${response['message'] ?? 'Unknown error'}');
+      }
     } catch (e) {
       print('Error fetching cart: $e');
     }
   }
 
   // Add product to cart
-  Future<void> addItem(String id, String name, int price, String image, {String? size}) async {
+  Future<void> addItem(String id, String name, double price, String image, {String? variant, int quantity = 1}) async {
     try {
-      final response = await _apiService.post('cart/add', {
-        'product_id': id,
-        'quantity': 1,
-        if (size != null) 'size': size,
+      final response = await _apiService.post('/api/cart/add', {
+        'productId': id,
+        'quantity': quantity,
+        if (variant != null) 'variant': variant,
       });
 
-      if (response['success']) {
+      if (response['code'] == 200) {
         await fetchCart(); // Update cart from server
       }
     } catch (e) {
       print('Error adding to cart: $e');
       // Fallback: handle offline addition if API fails
-      final existingItemIndex = _items.indexWhere((item) => item.id == id);
+      final existingItemIndex = _items.indexWhere((item) => 
+          item.id == id && item.variant == variant);
 
       if (existingItemIndex >= 0) {
-        _items[existingItemIndex].quantity += 1;
+        _items[existingItemIndex].quantity += quantity;
       } else {
         _items.add(
           CartItem(
@@ -54,7 +60,8 @@ class CartService extends ChangeNotifier {
             name: name,
             price: price,
             image: image,
-            size: size,
+            variant: variant,
+            quantity: quantity,
           ),
         );
       }
@@ -63,35 +70,47 @@ class CartService extends ChangeNotifier {
   }
 
   // Remove product from cart
-  Future<void> removeItem(String id) async {
+  Future<void> removeItem(String id, {String? variant}) async {
     try {
-      final response = await _apiService.delete('cart/item/$id');
-      if (response['success']) {
+      final String endpoint = variant != null 
+          ? '/api/cart/item/$id?variant=$variant' 
+          : '/api/cart/item/$id';
+      
+      final response = await _apiService.delete(endpoint);
+      if (response['code'] == 200) {
         await fetchCart(); // Update cart from server
       }
     } catch (e) {
       print('Error removing from cart: $e');
       // Fallback: handle offline removal if API fails
-      _items.removeWhere((item) => item.id == id);
+      if (variant != null) {
+        _items.removeWhere((item) => item.id == id && item.variant == variant);
+      } else {
+        _items.removeWhere((item) => item.id == id);
+      }
       notifyListeners();
     }
   }
 
   // Update product quantity
-  Future<void> updateQuantity(String id, int quantity) async {
+  Future<void> updateQuantity(String id, int quantity, {String? variant}) async {
     try {
-      final response = await _apiService.put('cart/update', {
-        'product_id': id,
+      final response = await _apiService.put('/api/cart/update', {
+        'id': id,
         'quantity': quantity,
+        if (variant != null) 'variant': variant,
       });
 
-      if (response['success']) {
+      if (response['code'] == 200) {
         await fetchCart(); // Update cart from server
       }
     } catch (e) {
       print('Error updating cart: $e');
       // Fallback: handle offline update if API fails
-      final existingItemIndex = _items.indexWhere((item) => item.id == id);
+      final existingItemIndex = variant != null
+          ? _items.indexWhere((item) => item.id == id && item.variant == variant)
+          : _items.indexWhere((item) => item.id == id);
+          
       if (existingItemIndex >= 0) {
         if (quantity <= 0) {
           _items.removeAt(existingItemIndex);
@@ -106,8 +125,8 @@ class CartService extends ChangeNotifier {
   // Clear entire cart
   Future<void> clear() async {
     try {
-      final response = await _apiService.delete('cart/clear');
-      if (response['success']) {
+      final response = await _apiService.delete('/api/cart/clear');
+      if (response['code'] == 200) {
         _items = [];
         notifyListeners();
       }

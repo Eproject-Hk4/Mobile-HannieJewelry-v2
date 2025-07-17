@@ -1,9 +1,9 @@
 class CartItem {
   final String id;
   final String name;
-  final int price;
+  final double price;
   final String image;
-  final String? size;
+  final String? variant;
   int quantity;
 
   CartItem({
@@ -11,7 +11,7 @@ class CartItem {
     required this.name,
     required this.price,
     required this.image,
-    this.size,
+    this.variant,
     this.quantity = 1,
   });
 
@@ -21,7 +21,7 @@ class CartItem {
       'name': name,
       'price': price,
       'image': image,
-      'size': size,
+      'variant': variant,
       'quantity': quantity,
     };
   }
@@ -30,9 +30,9 @@ class CartItem {
     return CartItem(
       id: map['id'],
       name: map['name'],
-      price: map['price'],
+      price: (map['price'] is int) ? (map['price'] as int).toDouble() : map['price'],
       image: map['image'] ?? 'assets/images/placeholder.png',
-      size: map['size'],
+      variant: map['variant'],
       quantity: map['quantity'] ?? 1,
     );
   }

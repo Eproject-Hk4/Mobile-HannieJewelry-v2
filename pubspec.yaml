@@ -11,9 +11,10 @@ dependencies:
     sdk: flutter
   # Thêm dòng này
   http: ^0.13.5
-  provider: ^6.1.5
+  provider: ^6.0.5
   qr_flutter: ^4.1.0  # Thêm package này để tạo mã QR
-  shared_preferences: ^2.2.2  # Thêm package này để sử dụng SharedPreferences
+  shared_preferences: ^2.2.0
+  flutter_secure_storage: ^8.0.0
   intl: ^0.18.1  # Thêm thư viện intl để định dạng ngày tháng
 
 dev_dependencies:
@@ -28,15 +29,18 @@ flutter_native_splash:
   image: assets/images/splash_image.png
   android: true
   ios: true
-  android_gravity: fill
-  ios_content_mode: scaleToFill
+  android_gravity: center
+  ios_content_mode: center
   fullscreen: true
   android_12:
-    image: assets/images/splash_image.png
+    image: null
     color: "#ffffff"
     icon_background_color: "#ffffff"
+    image_dark: assets/images/splash_image.png
+    branding: null
   image_dark: assets/images/splash_image.png
   color_dark: "#ffffff"
+  web: false
 
 flutter:
   uses-material-design: true

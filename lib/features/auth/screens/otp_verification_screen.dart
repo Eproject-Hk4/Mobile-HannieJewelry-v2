@@ -5,50 +5,50 @@ import '../../../core/constants/app_styles.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../home/screens/home_screen.dart';
 import '../services/auth_service.dart';
+import 'package:flutter/services.dart';
+import 'login_screen.dart';
 
 class OTPVerificationScreen extends StatefulWidget {
+  final String? redirectRoute;
   final bool isRegistration;
-  
+
   const OTPVerificationScreen({
-    Key? key, 
+    super.key, 
+    this.redirectRoute,
     this.isRegistration = false,
-  }) : super(key: key);
+  });
 
   @override
   State<OTPVerificationScreen> createState() => _OTPVerificationScreenState();
 }
 
 class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
-  final List<TextEditingController> _otpControllers = List.generate(
-    6,
-    (index) => TextEditingController(),
-  );
-  final List<FocusNode> _focusNodes = List.generate(
-    6,
-    (index) => FocusNode(),
-  );
+  final TextEditingController _otpController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
-    for (var controller in _otpControllers) {
-      controller.dispose();
-    }
-    for (var node in _focusNodes) {
-      node.dispose();
-    }
+    _otpController.dispose();
     super.dispose();
   }
 
-  String _getOtpCode() {
-    return _otpControllers.map((controller) => controller.text).join();
-  }
-
   Future<void> _verifyOTP() async {
-    final otp = _getOtpCode();
-    if (otp.length != 6) {
+    if (_otpController.text.isEmpty || _otpController.text.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter all 6 OTP digits')),
+        const SnackBar(content: Text('Please enter a valid 6-digit OTP')),
+      );
+      return;
+    }
+
+    final authService = Provider.of<AuthService>(context, listen: false);
+    
+    // Check if OTP has expired
+    if (authService.otpRemainingTime <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('OTP has expired. Please request a new code.'),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -57,53 +57,84 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       _isLoading = true;
     });
 
-    final authService = Provider.of<AuthService>(context, listen: false);
-    final success = await authService.verifyOTP(otp, isRegistration: widget.isRegistration);
+    try {
+      final success = await authService.verifyOTP(_otpController.text);
 
-    setState(() {
-      _isLoading = false;
-    });
+      if (!mounted) return;
+      
+      setState(() {
+        _isLoading = false;
+      });
 
-    if (success && mounted) {
-      // Show success message for registration
-      if (widget.isRegistration && mounted) {
+      if (success) {
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration successful!')),
+          const SnackBar(
+            content: Text('Login successful!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        
+        // Wait a moment before navigating
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          if (!mounted) return;
+          
+          // Navigate to home screen or redirect route
+          if (widget.redirectRoute != null) {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              widget.redirectRoute!,
+              (route) => false,
+            );
+          } else {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+            );
+          }
+        });
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid or expired OTP code. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
+    } catch (e) {
+      if (!mounted) return;
       
-      // Navigate to home screen
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-        (route) => false,
-      );
-    } else if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+      
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid OTP. Please try again.')),
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
 
-  void _onOtpChanged(int index, String value) {
-    if (value.isNotEmpty && index < 5) {
-      _focusNodes[index + 1].requestFocus();
+  String _formatRemainingTime(int seconds) {
+    if (seconds <= 0) {
+      return "Expired";
     }
+    
+    // Format time as minutes:seconds
+    final int minutes = seconds ~/ 60;
+    final int remainingSeconds = seconds % 60;
+    return "$minutes:${remainingSeconds.toString().padLeft(2, '0')}";
   }
 
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
     final phoneNumber = authService.phoneNumber ?? '';
+    final otpRemainingTime = authService.otpRemainingTime;
     
-    final screenTitle = widget.isRegistration 
-        ? 'Complete Registration' 
-        : 'OTP Verification';
-    
-    final screenSubtitle = widget.isRegistration
-        ? 'Enter the verification code to complete your registration'
-        : 'Enter the verification code sent to $phoneNumber';
-
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -119,60 +150,97 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
             children: [
               const SizedBox(height: 24),
               Text(
-                screenTitle,
+                'OTP Verification',
                 style: AppStyles.heading,
               ),
               const SizedBox(height: 8),
               Text(
-                screenSubtitle,
+                'Enter the verification code sent to $phoneNumber',
                 style: AppStyles.bodyTextSmall,
               ),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(
-                  6,
-                  (index) => SizedBox(
-                    width: 40,
-                    child: TextField(
-                      controller: _otpControllers[index],
-                      focusNode: _focusNodes[index],
-                      textAlign: TextAlign.center,
-                      keyboardType: TextInputType.number,
-                      maxLength: 1,
-                      decoration: const InputDecoration(
-                        counterText: '',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (value) => _onOtpChanged(index, value),
+              const SizedBox(height: 16),
+              // OTP expiration timer
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: otpRemainingTime > 0 ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.timer,
+                      size: 16,
+                      color: otpRemainingTime > 0 ? Colors.green : Colors.red,
                     ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Code expires in: ${_formatRemainingTime(otpRemainingTime)}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: otpRemainingTime > 0 ? Colors.green : Colors.red,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              // OTP Input Field
+              TextField(
+                controller: _otpController,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 24, letterSpacing: 8),
+                decoration: InputDecoration(
+                  hintText: "000000",
+                  counterText: '',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
                   ),
                 ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
+                onChanged: (value) {
+                  // Auto-submit when 6 digits are entered
+                  if (value.length == 6) {
+                    FocusScope.of(context).unfocus();
+                  }
+                },
               ),
               const SizedBox(height: 32),
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : CustomButton(
-                      text: 'Confirm',
+                      text: 'Verify',
                       onPressed: _verifyOTP,
                     ),
               const SizedBox(height: 16),
               Center(
                 child: TextButton(
-                  onPressed: () {
+                  onPressed: otpRemainingTime <= 0 ? () {
                     if (phoneNumber.isNotEmpty) {
+                      final authService = Provider.of<AuthService>(context, listen: false);
                       authService.sendOTP(phoneNumber);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('New OTP has been sent'),
+                          backgroundColor: Colors.green,
                         ),
                       );
                     }
-                  },
+                  } : null,
                   child: Text(
-                    'Resend code',
+                    otpRemainingTime <= 0 ? 'Resend code' : 'Wait ${_formatRemainingTime(otpRemainingTime)} to resend',
                     style: AppStyles.bodyText.copyWith(
-                      color: AppColors.primary,
+                      color: otpRemainingTime <= 0 ? AppColors.primary : Colors.grey,
                     ),
                   ),
                 ),

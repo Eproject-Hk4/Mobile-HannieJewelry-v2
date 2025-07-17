@@ -16,20 +16,30 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
+  late TextEditingController _emailController;
+  late TextEditingController _dateOfBirthController;
+  String _selectedGender = 'Male';
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     final authService = Provider.of<AuthService>(context, listen: false);
-    _nameController = TextEditingController(text: authService.currentUser?.name ?? '');
-    _phoneController = TextEditingController(text: authService.currentUser?.phone ?? '');
+    final user = authService.currentUser;
+    
+    _nameController = TextEditingController(text: user?.name ?? '');
+    _phoneController = TextEditingController(text: user?.phone ?? '');
+    _emailController = TextEditingController(text: user?.email ?? '');
+    _dateOfBirthController = TextEditingController(text: user?.dateOfBirth ?? '');
+    _selectedGender = user?.gender ?? 'Male';
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
+    _emailController.dispose();
+    _dateOfBirthController.dispose();
     super.dispose();
   }
 
@@ -38,21 +48,59 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _isLoading = true;
     });
 
-    // In reality, you would call an API to update user information
-    // This is simulating a successful update
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Show success message
-    if (mounted) {
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      
+      // Prepare profile data
+      final profileData = {
+        'name': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'dateOfBirth': _dateOfBirthController.text.trim(),
+        'gender': _selectedGender,
+      };
+      
+      // Call the updateProfile method
+      final success = await authService.updateProfile(profileData);
+      
+      if (!mounted) return;
+      
+      setState(() {
+        _isLoading = false;
+      });
+      
+      if (success) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context, true); // Return true to indicate successful update
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to update profile. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      
+      setState(() {
+        _isLoading = false;
+      });
+      
+      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully')),
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
       );
-      Navigator.pop(context, true); // Return true to indicate successful update
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
@@ -119,6 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             const SizedBox(height: 16),
             TextField(
+              controller: _emailController,
               decoration: const InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
@@ -128,6 +177,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             const SizedBox(height: 16),
             TextField(
+              controller: _dateOfBirthController,
               decoration: const InputDecoration(
                 labelText: 'Date of Birth',
                 border: OutlineInputBorder(),
@@ -154,16 +204,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     children: [
                       Radio(
                         value: 'Male',
-                        groupValue: 'Male',
-                        onChanged: (value) {},
+                        groupValue: _selectedGender,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedGender = value.toString();
+                          });
+                        },
                         activeColor: AppColors.primary,
                       ),
                       const Text('Male'),
                       const SizedBox(width: 16),
                       Radio(
                         value: 'Female',
-                        groupValue: 'Male',
-                        onChanged: (value) {},
+                        groupValue: _selectedGender,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedGender = value.toString();
+                          });
+                        },
                         activeColor: AppColors.primary,
                       ),
                       const Text('Female'),

@@ -1,66 +1,92 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:math';
+import 'dart:async';
 
 import '../models/user_model.dart';
 import '../../../core/services/api_service.dart';
 
 class AuthService extends ChangeNotifier {
   final ApiService _apiService = ApiService();
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  
   User? _currentUser;
   bool _isAuthenticated = false;
   String? _verificationId;
   String? _phoneNumber;
-  String? _registrationName;
+  Timer? _otpTimer;
+  int _otpRemainingTime = 0;
+  
+  // OTP expiration time in seconds (5 minutes)
+  static const int otpExpirationTime = 300;
+  
+  // Keys for secure storage
+  static const String _tokenKey = 'auth_token';
+  static const String _isLoggedInKey = 'is_logged_in';
 
   User? get currentUser => _currentUser;
   bool get isAuthenticated => _isAuthenticated;
   bool get isLoggedIn => _isAuthenticated;  // Alias for isAuthenticated
   String? get verificationId => _verificationId;
   String? get phoneNumber => _phoneNumber;
-
-  Future<void> initialize() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-    
-    if (isLoggedIn) {
-      final token = prefs.getString('authToken');
-      if (token != null) {
-        _apiService.setAuthToken(token);
-        try {
-          final userData = await _apiService.get('user/profile');
-          _currentUser = User.fromMap(userData);
-          _isAuthenticated = true;
-        } catch (e) {
-          await logout();
-        }
-      }
-    }
-    
+  int get otpRemainingTime => _otpRemainingTime;
+  
+  // Setter for phoneNumber
+  set phoneNumber(String? value) {
+    _phoneNumber = value;
     notifyListeners();
   }
 
-  // Method to store registration data temporarily
-  void setRegistrationData(String name) {
-    _registrationName = name;
-    notifyListeners();
+  Future<void> initialize() async {
+    try {
+      // Read login status from secure storage
+      final isLoggedInStr = await _secureStorage.read(key: _isLoggedInKey);
+      final isLoggedIn = isLoggedInStr == 'true';
+      
+      if (isLoggedIn) {
+        final token = await _secureStorage.read(key: _tokenKey);
+        if (token != null) {
+          _apiService.setAuthToken(token);
+          try {
+            final userData = await _apiService.get('/api/user/profile');
+            _currentUser = User.fromMap(userData);
+            _isAuthenticated = true;
+          } catch (e) {
+            await logout();
+          }
+        }
+      }
+      
+      notifyListeners();
+    } catch (e) {
+      print('Error initializing auth service: $e');
+      // Reset authentication state on error
+      _isAuthenticated = false;
+      notifyListeners();
+    }
   }
 
   Future<void> logout() async {
     try {
-      await _apiService.post('auth/logout', {});
+      await _apiService.post('/api/auth/logout', {});
     } catch (e) {
       // Ignore errors during logout
+      print('Error during logout API call: $e');
     }
     
     _currentUser = null;
     _isAuthenticated = false;
     _apiService.removeAuthToken();
     
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false);
-    await prefs.remove('authToken');
+    // Clear secure storage
+    try {
+      await _secureStorage.delete(key: _tokenKey);
+      await _secureStorage.write(key: _isLoggedInKey, value: 'false');
+    } catch (e) {
+      print('Error clearing secure storage: $e');
+    }
     
     notifyListeners();
   }
@@ -69,121 +95,159 @@ class AuthService extends ChangeNotifier {
     try {
       _phoneNumber = phone;
       
-      final response = await _apiService.post('auth/send-otp', {
-        'phone': phone,
-      });
+      // Cancel any existing OTP timer
+      _cancelOtpTimer();
       
-      if (response['success']) {
-        _verificationId = response['verification_id'];
+      // Use the unified endpoint for requesting OTP
+      final endpoint = '/api/auth/request-otp';
+      
+      // API only needs the phone number
+      final Map<String, dynamic> requestData = {
+        'phone': phone,
+      };
+      
+      print('Sending OTP with endpoint: $endpoint and data: $requestData');
+      
+      final response = await _apiService.post(endpoint, requestData);
+      
+      if (response['code'] == 200) {
+        _verificationId = response['data'];
+        
+        // Start OTP expiration timer (5 minutes = 300 seconds)
+        _startOtpTimer(otpExpirationTime);
+        
         notifyListeners();
         return true;
       }
       return false;
     } catch (e) {
       print('OTP sending error: $e');
-      
-      // For demo purposes, simulate successful OTP sending
-      _verificationId = _generateRandomString(20);
-      print('Sample OTP: 123456');
-      notifyListeners();
-      return true;
+      return false;
     }
   }
   
-  Future<bool> verifyOTP(String otp, {bool isRegistration = false}) async {
+  Future<bool> verifyOTP(String otp) async {
     try {
-      if (_verificationId == null || _phoneNumber == null) {
+      if (_phoneNumber == null) {
         return false;
       }
       
-      if (isRegistration && _registrationName == null) {
+      // Check if OTP has expired
+      if (_otpRemainingTime <= 0) {
+        print('OTP has expired');
         return false;
       }
       
-      final Map<String, dynamic> requestData = {
-        'verification_id': _verificationId,
-        'otp': otp,
+      // Use the unified endpoint for OTP verification
+      final endpoint = '/api/auth/login-otp';
+      final requestData = {
         'phone': _phoneNumber,
+        'otp': otp,
       };
       
-      // Add registration data if this is a registration flow
-      if (isRegistration) {
-        requestData['name'] = _registrationName;
-        requestData['is_registration'] = true;
-      }
+      print('Verifying OTP with endpoint: $endpoint and data: $requestData');
+      final response = await _apiService.post(endpoint, requestData);
       
-      final response = await _apiService.post(
-        isRegistration ? 'auth/register-with-otp' : 'auth/verify-otp', 
-        requestData
-      );
+      print('API Response: $response');
       
-      if (response['success']) {
-        final token = response['token'];
-        final userData = response['user'];
-        
-        _apiService.setAuthToken(token);
-        _currentUser = User.fromMap(userData);
-        _isAuthenticated = true;
-        
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('authToken', token);
-        
-        // Clear registration data after successful registration
-        if (isRegistration) {
-          _registrationName = null;
+      if (response['code'] == 200) {
+        try {
+          // Get token from response
+          final token = response['data']['token'];
+          final expiresIn = response['data']['expires_in'] ?? 86400000; // Default to 24 hours
+          
+          // Set authentication state
+          _isAuthenticated = true;
+          
+          // Create a temporary User object with basic information
+          _currentUser = User(
+            id: '1',
+            name: 'User',
+            phone: _phoneNumber ?? '',
+            email: null,
+          );
+          
+          // Save token to API Service and secure storage
+          _apiService.setAuthToken(token);
+          await _secureStorage.write(key: _tokenKey, value: token);
+          await _secureStorage.write(key: _isLoggedInKey, value: 'true');
+          
+          // Fetch user profile data after successful authentication
+          await _fetchUserProfile();
+          
+          // Cancel OTP timer as it's been used successfully
+          _cancelOtpTimer();
+          
+          notifyListeners();
+          return true;
+        } catch (e) {
+          print('Error parsing user data: $e');
+          return false;
         }
-        
+      }
+      return false;
+    } catch (e) {
+      print('OTP verification error: $e');
+      return false;
+    }
+  }
+  
+  void _startOtpTimer(int seconds) {
+    _otpRemainingTime = seconds;
+    _otpTimer?.cancel();
+    _otpTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_otpRemainingTime > 0) {
+        _otpRemainingTime--;
+        notifyListeners();
+      } else {
+        _cancelOtpTimer();
+      }
+    });
+  }
+  
+  void _cancelOtpTimer() {
+    _otpTimer?.cancel();
+    _otpTimer = null;
+    _otpRemainingTime = 0;
+    notifyListeners();
+  }
+  
+  Future<bool> _fetchUserProfile() async {
+    try {
+      final userData = await _apiService.get('/api/user/profile');
+      if (userData != null) {
+        _currentUser = User.fromMap(userData);
         notifyListeners();
         return true;
       }
       return false;
     } catch (e) {
-      print('OTP verification error: $e');
-      
-      // For demo purposes, simulate successful verification
-      if (otp == '123456') {
-        // Create a user based on whether this is registration or login
-        if (isRegistration && _registrationName != null) {
-          _currentUser = User(
-            id: _generateRandomString(10),
-            name: _registrationName!,
-            phone: _phoneNumber!,
-          );
-        } else {
-          _currentUser = User(
-            id: _generateRandomString(10),
-            name: 'Sample User',
-            phone: _phoneNumber!,
-          );
-        }
-        
-        _isAuthenticated = true;
-        
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('authToken', _generateRandomString(30));
-        
-        // Clear registration data after successful registration
-        if (isRegistration) {
-          _registrationName = null;
-        }
-        
-        notifyListeners();
-        return true;
-      }
+      print('Error fetching user profile: $e');
       return false;
     }
   }
   
-  String _generateRandomString(int length) {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    final random = Random();
-    return String.fromCharCodes(
-      Iterable.generate(
-        length, 
-        (_) => chars.codeUnitAt(random.nextInt(chars.length)),
-      ),
-    );
+  Future<bool> updateProfile(Map<String, dynamic> profileData) async {
+    try {
+      final response = await _apiService.put('/api/user/profile', profileData);
+      
+      if (response['code'] == 200) {
+        // Update the current user with new data
+        if (_currentUser != null) {
+          _currentUser = _currentUser!.copyWith(
+            name: profileData['name'],
+            email: profileData['email'],
+            dateOfBirth: profileData['dateOfBirth'],
+            gender: profileData['gender'],
+          );
+          notifyListeners();
+        }
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error updating profile: $e');
+      return false;
+    }
   }
 }

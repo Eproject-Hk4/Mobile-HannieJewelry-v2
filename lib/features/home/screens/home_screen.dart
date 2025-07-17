@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_styles.dart';
+import '../../../core/services/auth_guard_service.dart';
 import '../../products/screens/order_screen.dart';
 import '../../profile/screens/points_screen.dart';
 import '../../profile/screens/member_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../profile/screens/rewards_screen.dart';
+import '../../auth/services/auth_service.dart';
 import 'promotions_screen.dart';
 import 'qr_scan_screen.dart';
 import 'branch_screen.dart';
@@ -29,6 +31,15 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Lấy dịch vụ xác thực và phân quyền
+    final authService = Provider.of<AuthService>(context);
+    final authGuard = Provider.of<AuthGuardService>(context, listen: false);
+    
+    // Hiển thị tên người dùng nếu đã đăng nhập
+    final userName = authService.isAuthenticated && authService.currentUser != null 
+        ? authService.currentUser!.name 
+        : "Guest";
+    
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -50,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 14, color: Colors.white),
                 ),
                 Text(
-                  'John Smith',
+                  userName,
                   style: AppStyles.bodyText.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -65,8 +76,10 @@ class HomeScreen extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.notifications_outlined, color: Colors.white),
                       onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+                        authGuard.checkAndNavigate(
+                          context,
+                          'Notifications',
+                          const NotificationsScreen(),
                         );
                       },
                     ),
@@ -104,8 +117,10 @@ class HomeScreen extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const MemberScreen()),
+                authGuard.checkAndNavigate(
+                  context, 
+                  'Member', 
+                  const MemberScreen()
                 );
               },
               child: Container(
@@ -155,17 +170,17 @@ class HomeScreen extends StatelessWidget {
                 crossAxisCount: 4,
                 childAspectRatio: 0.9,
                 children: [
-                  _buildFeatureItem(context, Icons.qr_code, 'Earn Points'),
-                  _buildFeatureItem(context, Icons.card_giftcard, 'Redeem'),
-                  _buildFeatureItem(context, Icons.shopping_bag_outlined, 'Order'),
-                  _buildFeatureItem(context, Icons.swap_horiz, 'Exchange'),
-                  _buildFeatureItem(context, Icons.phone, 'Contact'),
-                  _buildFeatureItem(context, Icons.security, 'Warranty'),
-                  _buildFeatureItem(context, Icons.local_shipping_outlined, 'Tracking'),
-                  _buildFeatureItem(context, Icons.support_agent, 'Support'),
-                  _buildFeatureItem(context, Icons.rate_review_outlined, 'Feedback'),
-                  _buildFeatureItem(context, Icons.assignment_outlined, 'Survey'),
-                  _buildFeatureItem(context, Icons.newspaper, 'News'),
+                  _buildFeatureItem(context, Icons.qr_code, 'Earn Points', authGuard),
+                  _buildFeatureItem(context, Icons.card_giftcard, 'Redeem', authGuard),
+                  _buildFeatureItem(context, Icons.shopping_bag_outlined, 'Order', authGuard),
+                  _buildFeatureItem(context, Icons.swap_horiz, 'Exchange', authGuard),
+                  _buildFeatureItem(context, Icons.phone, 'Contact', authGuard),
+                  _buildFeatureItem(context, Icons.security, 'Warranty', authGuard),
+                  _buildFeatureItem(context, Icons.local_shipping_outlined, 'Tracking', authGuard),
+                  _buildFeatureItem(context, Icons.support_agent, 'Support', authGuard),
+                  _buildFeatureItem(context, Icons.rate_review_outlined, 'Feedback', authGuard),
+                  _buildFeatureItem(context, Icons.assignment_outlined, 'Survey', authGuard),
+                  _buildFeatureItem(context, Icons.newspaper, 'News', authGuard),
                 ],
               ),
             ),
@@ -251,9 +266,12 @@ class HomeScreen extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const BranchScreen()),
             );
           } else if (index == 4) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const ProfileScreen()),
-            );
+            // Kiểm tra quyền truy cập trước khi chuyển đến trang Profile
+            if (authGuard.checkAccess(context, 'Profile')) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            }
           }
         },
         items: const [
@@ -292,42 +310,44 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureItem(BuildContext context, IconData icon, String label) {
+  Widget _buildFeatureItem(BuildContext context, IconData icon, String label, AuthGuardService authGuard) {
     return GestureDetector(
       onTap: () {
+        Widget? destination;
+        
         switch (label) {
           case 'Earn Points':
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PointsScreen()));
+            destination = const PointsScreen();
             break;
           case 'Redeem':
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RewardsScreen()));
+            destination = const RewardsScreen();
             break;
           case 'Order':
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OrderScreen()));
+            destination = const OrderScreen();
             break;
           case 'Exchange':
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReturnExchangeScreen()));
+            destination = const ReturnExchangeScreen();
             break;
           case 'Contact':
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ContactScreen()));
+            destination = const ContactScreen();
             break;
           case 'Warranty':
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WarrantyScreen()));
+            destination = const WarrantyScreen();
             break;
           case 'Tracking':
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TrackingScreen()));
+            destination = const TrackingScreen();
             break;
           case 'Support':
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SupportCenterScreen()));
+            destination = const SupportCenterScreen();
             break;
           case 'Feedback':
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FeedbackScreen()));
+            destination = const FeedbackScreen();
             break;
           case 'Survey':
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SurveyScreen()));
+            destination = const SurveyScreen();
             break;
           case 'News':
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NewsScreen()));
+            destination = const NewsScreen();
             break;
           default:
             ScaffoldMessenger.of(context).showSnackBar(
@@ -336,6 +356,18 @@ class HomeScreen extends StatelessWidget {
                 duration: Duration(seconds: 2),
               ),
             );
+        }
+        
+        if (destination != null) {
+          // Nếu là màn hình Order, cho phép truy cập trực tiếp mà không cần kiểm tra xác thực
+          if (label == 'Order') {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => destination as Widget),
+            );
+          } else {
+            // Các tính năng khác vẫn kiểm tra xác thực
+            authGuard.checkAndNavigate(context, label, destination);
+          }
         }
       },
       child: Column(

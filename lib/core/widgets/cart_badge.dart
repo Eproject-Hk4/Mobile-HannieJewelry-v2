@@ -7,12 +7,70 @@ import '../../features/cart/screens/cart_screen.dart';
 import '../../features/cart/services/cart_service.dart';
 
 class CartBadge extends StatelessWidget {
-  const CartBadge({Key? key}) : super(key: key);
+  final int? count;
+  final VoidCallback? onPressed;
+  
+  const CartBadge({
+    Key? key,
+    this.count,
+    this.onPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
 
+    if (count != null) {
+      // Use provided count and onPressed
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.shopping_cart),
+            onPressed: onPressed ?? () {
+              // Check login before opening cart
+              if (authService.isAuthenticated) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CartScreen(),
+                  ),
+                );
+              } else {
+                _showLoginRequiredDialog(context);
+              }
+            },
+          ),
+          if (count! > 0)
+            Positioned(
+              top: 5,
+              right: 5,
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                constraints: const BoxConstraints(
+                  minWidth: 16,
+                  minHeight: 16,
+                ),
+                child: Text(
+                  '$count',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+        ],
+      );
+    }
+
+    // Original implementation using CartService
     return Consumer<CartService>(
       builder: (context, cartService, child) {
         return Stack(

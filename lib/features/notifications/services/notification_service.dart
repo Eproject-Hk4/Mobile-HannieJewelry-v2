@@ -1,50 +1,76 @@
 import 'package:flutter/material.dart';
 import '../models/notification_model.dart';
 import '../../../core/services/api_service.dart';
+import '../../../features/auth/services/auth_service.dart';
 
 class NotificationService extends ChangeNotifier {
   final ApiService _apiService = ApiService();
+  final AuthService? _authService;
   List<NotificationModel> _notifications = [];
 
-  NotificationService() {
+  NotificationService({AuthService? authService}) : _authService = authService {
     fetchNotifications();
   }
 
   List<NotificationModel> get notifications => _notifications;
 
-  int get unreadCount => _notifications.where((notification) => !notification.isRead).length;
+  int get unreadCount {
+    // Return 0 if user is not authenticated
+    if (_authService != null && !_authService!.isAuthenticated) {
+      return 0;
+    }
+    return _notifications.where((notification) => !notification.isRead).length;
+  }
 
   Future<void> fetchNotifications() async {
-    try {
-      final response = await _apiService.get('notifications');
-      // The response might be directly a List or contained in the body
-      List<dynamic> notificationsData;
-      
-      if (response is List) {
-        // If response is already a list
-        notificationsData = response;
-      } else if (response is Map && response.containsKey('notifications')) {
-        // If response is a map with 'notifications' key
-        notificationsData = response['notifications'];
-      } else {
-        // If response is a map but doesn't have 'notifications' key
-        // Try to parse the response body directly
-        notificationsData = response as List<dynamic>;
-      }
-      
-      _notifications = notificationsData
-          .map((notification) => NotificationModel.fromMap(notification))
-          .toList();
+    // Skip fetching if user is not authenticated
+    if (_authService != null && !_authService!.isAuthenticated) {
+      _notifications = [];
       notifyListeners();
+      return;
+    }
+    
+    try {
+      final response = await _apiService.get('/api/notifications');
+      
+      try {
+        if (response['code'] == 200 && response['data'] != null) {
+          final List<dynamic> notificationsData = response['data'];
+          
+          _notifications = notificationsData
+              .where((notification) => notification != null)
+              .map((notification) => NotificationModel.fromMap(notification))
+              .toList();
+          notifyListeners();
+        } else {
+          print('Error fetching notifications: ${response['message'] ?? 'Unknown error'}');
+          _initializeNotifications();
+        }
+      } catch (parseError) {
+        print('Error parsing notifications data: $parseError');
+        _initializeNotifications();
+      }
     } catch (e) {
       print('Error fetching notifications: $e');
-      // Fallback with sample data if API fails
-      _initializeNotifications();
+      // Fallback with sample data if API fails, but only for authenticated users
+      if (_authService == null || _authService!.isAuthenticated) {
+        _initializeNotifications();
+      } else {
+        _notifications = [];
+        notifyListeners();
+      }
     }
   }
 
   void _initializeNotifications() {
-    // Sample data
+    // Skip sample data if user is not authenticated
+    if (_authService != null && !_authService!.isAuthenticated) {
+      _notifications = [];
+      notifyListeners();
+      return;
+    }
+    
+    // Sample data only for authenticated users
     _notifications = [
       NotificationModel(
         id: '1',
@@ -56,78 +82,78 @@ class NotificationService extends ChangeNotifier {
       ),
       // Add other sample notifications if needed
     ];
+    notifyListeners();
   }
 
-  Future<void> markAsRead(String id, {Function? onSuccess}) async {
+  Future<void> markAsRead(String id) async {
     try {
-      final response = await _apiService.put('notifications/$id/read', {});
-      if (response['success']) {
-        final index = _notifications.indexWhere((notification) => notification.id == id);
+      final response = await _apiService.put('/api/notifications/$id/read', {});
+      if (response['code'] == 200) {
+        // Update local notification
+        final index = _notifications.indexWhere((n) => n.id == id);
         if (index != -1) {
-          _notifications[index] = _notifications[index].copyWith(isRead: true);
+          _notifications[index].isRead = true;
           notifyListeners();
-          if (onSuccess != null) {
-            onSuccess();
-          }
         }
       }
     } catch (e) {
       print('Error marking as read: $e');
       // Offline fallback if API fails
-      final index = _notifications.indexWhere((notification) => notification.id == id);
+      final index = _notifications.indexWhere((n) => n.id == id);
       if (index != -1) {
-        _notifications[index] = _notifications[index].copyWith(isRead: true);
+        _notifications[index].isRead = true;
         notifyListeners();
-        if (onSuccess != null) {
-          onSuccess();
-        }
       }
     }
   }
 
   Future<void> markAllAsRead() async {
     try {
-      final response = await _apiService.put('notifications/read-all', {});
-      if (response['success']) {
-        _notifications = _notifications.map((notification) => 
-          notification.copyWith(isRead: true)).toList();
+      final response = await _apiService.put('/api/notifications/read-all', {});
+      if (response['code'] == 200) {
+        // Update all local notifications
+        for (var notification in _notifications) {
+          notification.isRead = true;
+        }
         notifyListeners();
       }
     } catch (e) {
       print('Error marking all as read: $e');
       // Offline fallback if API fails
-      _notifications = _notifications.map((notification) => 
-        notification.copyWith(isRead: true)).toList();
+      for (var notification in _notifications) {
+        notification.isRead = true;
+      }
       notifyListeners();
     }
   }
 
   Future<void> deleteNotification(String id) async {
     try {
-      final response = await _apiService.delete('notifications/$id');
-      if (response['success']) {
-        _notifications.removeWhere((notification) => notification.id == id);
+      final response = await _apiService.delete('/api/notifications/$id');
+      if (response['code'] == 200) {
+        // Remove from local list
+        _notifications.removeWhere((n) => n.id == id);
         notifyListeners();
       }
     } catch (e) {
       print('Error deleting notification: $e');
       // Offline fallback if API fails
-      _notifications.removeWhere((notification) => notification.id == id);
+      _notifications.removeWhere((n) => n.id == id);
       notifyListeners();
     }
   }
 
-  Future<void> clearAll() async {
+  Future<void> clearAllNotifications() async {
     try {
-      final response = await _apiService.delete('notifications/clear-all');
-      if (response['success']) {
-        _notifications = [];
+      final response = await _apiService.delete('/api/notifications/clear');
+      if (response['code'] == 200) {
+        _notifications.clear();
         notifyListeners();
       }
     } catch (e) {
       print('Error clearing all notifications: $e');
       // Offline fallback if API fails
-      _notifications = [];
+      _notifications.clear();
       notifyListeners();
     }
   }

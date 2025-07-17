@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../core/services/auth_guard_service.dart';
 import '../features/auth/screens/login_screen.dart';
+import '../features/auth/services/auth_service.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/products/screens/product_detail_screen.dart';
 import '../features/cart/screens/cart_screen.dart';
@@ -14,10 +17,130 @@ import '../features/info/screens/company_info_screen.dart';
 import '../main.dart';
 import 'app_routes.dart';
 import '../features/checkout/models/order_model.dart'; // Import for OrderModel
-import '../features/products/models/product_model.dart'; // Import for Product model
+
+/// RouteGuard kiểm tra quyền truy cập vào các route
+class RouteGuard extends StatelessWidget {
+  final String routeName;
+  final WidgetBuilder builder;
+
+  const RouteGuard({
+    Key? key,
+    required this.routeName,
+    required this.builder,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final authGuard = Provider.of<AuthGuardService>(context, listen: false);
+    final authService = Provider.of<AuthService>(context, listen: false);
+    
+    // Kiểm tra nếu route yêu cầu đăng nhập và người dùng chưa đăng nhập
+    if (authGuard.routeRequiresAuth(routeName) && !authService.isAuthenticated) {
+      // Chuyển hướng đến trang đăng nhập
+      return LoginScreen(
+        redirectRoute: routeName,
+      );
+    }
+    
+    // Trường hợp không yêu cầu đăng nhập hoặc đã đăng nhập, hiển thị màn hình bình thường
+    return builder(context);
+  }
+}
 
 class AppPages {
-  static const initial = Routes.SPLASH; // Changed INITIAL to initial
+  static const initial = Routes.LOGIN; // Changed from SPLASH to LOGIN to skip splash screen but keep login
+
+  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case Routes.SPLASH:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => const SplashScreen(),
+        );
+      case Routes.LOGIN:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => const LoginScreen(),
+        );
+      case Routes.HOME:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => const HomeScreen(),
+        );
+      case Routes.PRODUCT_DETAIL:
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => ProductDetailScreen(
+            productId: args['productId'] as String,
+          ),
+        );
+      case Routes.CART:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => RouteGuard(
+            routeName: settings.name!,
+            builder: (context) => const CartScreen(),
+          ),
+        );
+      case Routes.CHECKOUT:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => RouteGuard(
+            routeName: settings.name!,
+            builder: (context) => const CheckoutScreen(),
+          ),
+        );
+      case Routes.ORDER_SUCCESS:
+        final args = settings.arguments as OrderModel;
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => RouteGuard(
+            routeName: settings.name!,
+            builder: (context) => OrderSuccessScreen(order: args),
+          ),
+        );
+      case Routes.ORDERS:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => RouteGuard(
+            routeName: settings.name!,
+            builder: (context) => const OrderHistoryScreen(),
+          ),
+        );
+      case Routes.ORDER_DETAIL:
+        final args = settings.arguments as String;
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => RouteGuard(
+            routeName: settings.name!,
+            builder: (context) => OrderDetailScreen(orderId: args),
+          ),
+        );
+      case Routes.PROFILE:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => RouteGuard(
+            routeName: settings.name!,
+            builder: (context) => const ProfileScreen(),
+          ),
+        );
+      case Routes.NOTIFICATIONS:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => const NotificationsScreen(),
+        );
+      case Routes.COMPANY_INFO:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => const CompanyInfoScreen(),
+        );
+      default:
+        return MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
+        );
+    }
+  }
 
   static final Map<String, WidgetBuilder> routes = {
     Routes.SPLASH: (context) => const SplashScreen(),
@@ -25,7 +148,6 @@ class AppPages {
     Routes.HOME: (context) => const HomeScreen(),
     Routes.PRODUCT_DETAIL: (context) => ProductDetailScreen(
       productId: (ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>)['productId'] as String,
-      product: (ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>)['product'] as Product?,
     ),
     Routes.CART: (context) => const CartScreen(),
     Routes.CHECKOUT: (context) => const CheckoutScreen(),

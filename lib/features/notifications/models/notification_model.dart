@@ -12,7 +12,7 @@ class NotificationModel {
   final String title;
   final String message;
   final DateTime timestamp;
-  final bool isRead;
+  late final bool isRead;
   final NotificationType type;
   final String? imageUrl;
 

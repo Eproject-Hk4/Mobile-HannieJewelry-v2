@@ -1,128 +1,115 @@
-# Hannie Jewelry API Server
+# JSON Server - API Documentation
 
-This is a mock API server for the Hannie Jewelry mobile app using JSON Server. It provides all the necessary endpoints to test the app's features, including the phone number OTP authentication system.
+## Installation and Running
 
-## Setup Instructions
-
-### Prerequisites
-- Node.js (v12 or higher)
-- npm (v6 or higher)
-
-### Installation
-
-1. Navigate to the json-server directory:
-```
-cd json-server
-```
-
+1. Make sure Node.js and npm are installed
 2. Install dependencies:
-```
-npm install
-```
+   ```
+   cd json-server
+   npm install
+   ```
+3. Run the server:
+   ```
+   npm start
+   ```
 
-3. Start the server:
-```
-npm start
-```
-
-The server will run on port 3800. For Android emulators, you can access it via `http://10.0.2.2:3800`.
+Server will run at http://localhost:3800
+For Android emulator, you can access via http://10.0.2.2:3800
 
 ## API Endpoints
 
 ### Authentication
 
-- **Send OTP**
-  - `POST /auth/send-otp`
-  - Request body: `{ "phone": "0123456789" }`
-  - Response: `{ "success": true, "verification_id": "abc123", "message": "OTP sent successfully" }`
-  - Note: For testing, the OTP is always "123456"
+| Endpoint                      | Method | Description                    | Body                         | Response                                |
+|-------------------------------|--------|--------------------------------|-----------------------------|----------------------------------------|
+| `/api/auth/request-otp`       | POST   | Request login OTP              | `{ phone }`                 | `{ code, data: verification_id, message }` |
+| `/api/auth/request-signup-otp` | POST  | Request signup OTP             | `{ phone }`                 | `{ code, data: verification_id, message }` |
+| `/api/auth/login-otp`         | POST   | Login/signup with OTP          | `{ phone, otp }`            | `{ code, data: { token, user, isNewUser }, message }` |
+| `/api/auth/logout`            | POST   | Logout                         | - | `{ code, message }` |
 
-- **Verify OTP (Login)**
-  - `POST /auth/verify-otp`
-  - Request body: `{ "verification_id": "abc123", "otp": "123456", "phone": "0123456789" }`
-  - Response: `{ "success": true, "token": "auth_token", "user": {...}, "message": "Login successful" }`
+### User
 
-- **Register with OTP**
-  - `POST /auth/register-with-otp`
-  - Request body: `{ "verification_id": "abc123", "otp": "123456", "phone": "0123456789", "name": "User Name" }`
-  - Response: `{ "success": true, "token": "auth_token", "user": {...}, "message": "Registration successful" }`
-
-- **Get User Profile**
-  - `GET /user/profile`
-  - Response: User object
-
-- **Logout**
-  - `POST /auth/logout`
-  - Response: `{ "success": true, "message": "Logged out successfully" }`
+| Endpoint              | Method | Description           | Body                       | Response                   |
+|-----------------------|--------|-----------------------|----------------------------|----------------------------|
+| `/api/user/profile`   | GET    | Get user profile      | - | `{ code, data: user }` |
+| `/api/user/profile`   | PUT    | Update profile        | `{ name, email, address }` | `{ code, data: user, message }` |
 
 ### Products
 
-- **Get All Products**
-  - `GET /products`
-
-- **Get Product by ID**
-  - `GET /products/:id`
-
-- **Get Categories**
-  - `GET /categories`
+| Endpoint                     | Method | Description               | Query Parameters           | Response                       |
+|------------------------------|--------|---------------------------|----------------------------|--------------------------------|
+| `/api/products`              | GET    | Get product list          | `category`, `featured`, `isNew` | `{ code, data: products }` |
+| `/api/products/:id`          | GET    | Get product by ID         | - | `{ code, data: product }` |
+| `/api/product-categories`    | GET    | Get product categories    | - | `{ code, data: categories }` |
 
 ### Cart
 
-- **Get Cart**
-  - `GET /cart`
-
-- **Add Item to Cart**
-  - `POST /cart/add`
-  - Request body: `{ "productId": "p1", "quantity": 1 }`
-
-- **Update Item Quantity**
-  - `PUT /cart/update`
-  - Request body: `{ "id": "p1", "quantity": 2 }`
-
-- **Remove Item from Cart**
-  - `DELETE /cart/item/:id`
-
-- **Clear Cart**
-  - `DELETE /cart/clear`
+| Endpoint                  | Method | Description                | Body/Params                | Response                    |
+|---------------------------|--------|----------------------------|----------------------------|---------------------------- |
+| `/api/cart`               | GET    | Get cart                   | - | `{ code, data: cart }` |
+| `/api/cart/add`           | POST   | Add product to cart        | `{ productId, quantity, size }` | `{ code, data: cart }` |
+| `/api/cart/update`        | PUT    | Update product in cart     | `{ id, quantity, size }` | `{ code, data: cart }` |
+| `/api/cart/item/:id`      | DELETE | Remove product from cart   | - | `{ code, data: cart }` |
+| `/api/cart/clear`         | DELETE | Clear entire cart          | - | `{ code, data: { id, userId, items: [] }, message }` |
 
 ### Orders
 
-- **Get All Orders**
-  - `GET /orders`
-
-- **Get Order by ID**
-  - `GET /orders/:id`
-
-- **Create Order**
-  - `POST /orders`
-  - Request body: `{ "items": [...], "totalAmount": 1000000, "paymentMethod": "COD", "shippingAddress": "..." }`
+| Endpoint              | Method | Description            | Body/Params                                | Response                     |
+|-----------------------|--------|------------------------|-------------------------------------------|------------------------------|
+| `/api/orders`         | GET    | Get user's orders      | - | `{ code, data: orders }` |
+| `/api/orders`         | POST   | Create new order       | `{ items, totalAmount, paymentMethod, shippingAddress }` | `{ code, data: order }` |
+| `/api/orders/:id`     | GET    | Get order by ID        | - | `{ code, data: order }` |
 
 ### Notifications
 
-- **Get All Notifications**
-  - `GET /notifications`
+| Endpoint                          | Method | Description                | Body/Params | Response                          |
+|-----------------------------------|--------|----------------------------|-------------|-----------------------------------|
+| `/api/notifications`              | GET    | Get user's notifications   | - | `{ code, data: notifications }` |
+| `/api/notifications/:id/read`     | PUT    | Mark notification as read  | - | `{ code, data: notification }` |
+| `/api/notifications/read-all`     | PUT    | Mark all as read           | - | `{ code, message }` |
 
-- **Mark Notification as Read**
-  - `PUT /notifications/:id/read`
+### Addresses
 
-- **Mark All Notifications as Read**
-  - `PUT /notifications/read-all`
+| Endpoint               | Method | Description              | Body/Params                             | Response                      |
+|------------------------|--------|--------------------------|----------------------------------------|-------------------------------|
+| `/api/addresses`       | GET    | Get user's addresses     | - | `{ code, data: addresses }` |
+| `/api/addresses`       | POST   | Add new address          | `{ recipientName, phone, address, isDefault }` | `{ code, data: address }` |
+| `/api/addresses/:id`   | PUT    | Update address           | `{ recipientName, phone, address, isDefault }` | `{ code, data: address }` |
+| `/api/addresses/:id`   | DELETE | Delete address           | - | `{ code, message }` |
 
-- **Delete Notification**
-  - `DELETE /notifications/:id`
+### Rewards and Points
 
-- **Clear All Notifications**
-  - `DELETE /notifications/clear-all`
+| Endpoint                  | Method | Description                | Body/Params    | Response                           |
+|---------------------------|--------|----------------------------|--------------|-----------------------------------|
+| `/api/rewards`            | GET    | Get available rewards      | - | `{ code, data: rewards }` |
+| `/api/points/history`     | GET    | Get points history         | - | `{ code, data: pointsHistory }` |
+| `/api/rewards/redeem`     | POST   | Redeem reward              | `{ rewardId }` | `{ code, data: { user, reward }, message }` |
 
-## Testing the OTP Authentication
+### News
 
-For testing purposes, the OTP is always "123456". The authentication flow works as follows:
+| Endpoint        | Method | Description             | Query Parameters | Response                    |
+|-----------------|--------|-------------------------|-------------------|----------------------------|
+| `/api/news`     | GET    | Get news list           | `featured`        | `{ code, data: news }` |
+| `/api/news/:id` | GET    | Get news by ID          | -                 | `{ code, data: newsArticle }` |
 
-1. Send OTP to a phone number
-2. Receive verification_id in the response
-3. Submit the OTP "123456" along with the verification_id and phone number
-4. For registration, also include the user's name
+### Promotions
 
-## Data Persistence
+| Endpoint          | Method | Description                | Query Parameters | Response                        |
+|-------------------|--------|----------------------------|-----------------|--------------------------------|
+| `/api/promotions` | GET    | Get active promotions     | - | `{ code, data: promotions }` |
 
-The server uses the `db.json` file for data storage. Any changes made through API calls will be saved to this file.
+### Store Branches
+
+| Endpoint            | Method | Description             | Query Parameters | Response                      |
+|---------------------|--------|------------------------|-----------------|------------------------------|
+| `/api/branches`     | GET    | Get branch list         | - | `{ code, data: branches }` |
+| `/api/branches/:id` | GET    | Get branch by ID        | - | `{ code, data: branch }` |
+
+## Authentication
+
+All endpoints requiring authentication need the Authorization header:
+```
+Authorization: Bearer [token]
+```
+
+Token is returned after successful login at `/api/auth/login-otp`.

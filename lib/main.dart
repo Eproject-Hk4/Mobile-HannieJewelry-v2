@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import 'app/app.dart';
 import 'app/app_provider.dart';
 import 'features/auth/screens/login_screen.dart';
+import 'features/auth/services/auth_service.dart';
+import 'features/home/screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,28 +35,61 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Navigate to LoginScreen after 1 second
-    Future.delayed(const Duration(seconds: 1), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
+    // Immediately check auth state without delay
+    _checkAuthAndRedirect();
+  }
+  
+  void _checkAuthAndRedirect() {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    
+    // Initialize auth service first
+    authService.initialize().then((_) {
+      // Redirect to Home if already logged in, otherwise to Login screen
+      if (authService.isAuthenticated) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    // Show the splash image full screen
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
         ),
-        child: Center(
-          child: Image.asset(
-            'assets/images/splash_image.png',
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-          ),
+        child: Stack(
+          children: [
+            // Full-screen image
+            Image.asset(
+              'assets/images/splash_image.png',
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+            ),
+            // Loading indicator at the bottom
+            const Positioned(
+              bottom: 50,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

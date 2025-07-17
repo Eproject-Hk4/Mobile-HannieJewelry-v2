@@ -7,10 +7,14 @@ import '../../../core/widgets/custom_button.dart';
 import '../../home/screens/home_screen.dart';
 import '../services/auth_service.dart';
 import 'otp_verification_screen.dart';
-import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final String? redirectRoute;
+  
+  const LoginScreen({
+    Key? key, 
+    this.redirectRoute,
+  }) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -41,6 +45,10 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     final authService = Provider.of<AuthService>(context, listen: false);
+    
+    // Save phone number before sending OTP
+    authService.phoneNumber = phone;
+    
     final success = await authService.sendOTP(phone);
 
     setState(() {
@@ -51,12 +59,18 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const OTPVerificationScreen(),
+          builder: (context) => OTPVerificationScreen(
+            redirectRoute: widget.redirectRoute,
+          ),
         ),
       );
     } else if (mounted) {
+      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to send OTP. Please try again.')),
+        const SnackBar(
+          content: Text('Failed to send verification code. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -64,7 +78,9 @@ class _LoginScreenState extends State<LoginScreen> {
   void _navigateToRegister() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const RegisterScreen()),
+      MaterialPageRoute(
+        builder: (context) => const LoginScreen(),
+      ),
     );
   }
 
@@ -83,7 +99,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Image.asset(
                     'assets/images/logo.png',
-                    height: 120,
+                    height: 300,
+                    width: 300,
+                    fit: BoxFit.contain,
                   ),
                   const SizedBox(height: 16),
                   const SizedBox(height: 8),
@@ -113,7 +131,32 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 keyboardType: TextInputType.phone,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 8),
+              // OTP info text
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: Colors.blue, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'A one-time verification code will be sent to your phone. The code will expire in 5 minutes.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.blue[800],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
               // Login button
               _isLoading
                   ? const CircularProgressIndicator()
@@ -122,25 +165,29 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: _sendOTP,
               ),
               const SizedBox(height: 16),
-              // Register button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Don't have an account? ",
-                    style: AppStyles.bodyTextSmall,
-                  ),
-                  TextButton(
-                    onPressed: _navigateToRegister,
-                    child: Text(
-                      'Register now',
-                      style: AppStyles.bodyTextSmall.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
+              // Note about automatic registration
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.person_add_outlined, color: Colors.green, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'If this is your first time, a new account will be automatically created for you.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.green[800],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const Spacer(),
               // Skip button
