@@ -6,6 +6,7 @@ import '../features/auth/screens/login_screen.dart';
 import '../features/auth/services/auth_service.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/products/screens/product_detail_screen.dart';
+import '../features/products/screens/product_browse_screen.dart';
 import '../features/cart/screens/cart_screen.dart';
 import '../features/checkout/screens/checkout_screen.dart';
 import '../features/checkout/screens/order_success_screen.dart';
@@ -18,7 +19,7 @@ import '../main.dart';
 import 'app_routes.dart';
 import '../features/checkout/models/order_model.dart'; // Import for OrderModel
 
-/// RouteGuard kiểm tra quyền truy cập vào các route
+
 class RouteGuard extends StatelessWidget {
   final String routeName;
   final WidgetBuilder builder;
@@ -34,15 +35,15 @@ class RouteGuard extends StatelessWidget {
     final authGuard = Provider.of<AuthGuardService>(context, listen: false);
     final authService = Provider.of<AuthService>(context, listen: false);
     
-    // Kiểm tra nếu route yêu cầu đăng nhập và người dùng chưa đăng nhập
+
     if (authGuard.routeRequiresAuth(routeName) && !authService.isAuthenticated) {
-      // Chuyển hướng đến trang đăng nhập
+
       return LoginScreen(
         redirectRoute: routeName,
       );
     }
     
-    // Trường hợp không yêu cầu đăng nhập hoặc đã đăng nhập, hiển thị màn hình bình thường
+
     return builder(context);
   }
 }
@@ -72,7 +73,7 @@ class AppPages {
         return MaterialPageRoute(
           settings: settings,
           builder: (context) => ProductDetailScreen(
-            productId: args['productId'] as String,
+            productHandle: args['productHandle'] as String,
           ),
         );
       case Routes.CART:
@@ -135,6 +136,11 @@ class AppPages {
           settings: settings,
           builder: (context) => const CompanyInfoScreen(),
         );
+      case Routes.PRODUCT_BROWSE:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => const ProductBrowseScreen(),
+        );
       default:
         return MaterialPageRoute(
           builder: (context) => const HomeScreen(),
@@ -147,7 +153,7 @@ class AppPages {
     Routes.LOGIN: (context) => const LoginScreen(),
     Routes.HOME: (context) => const HomeScreen(),
     Routes.PRODUCT_DETAIL: (context) => ProductDetailScreen(
-      productId: (ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>)['productId'] as String,
+      productHandle: (ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>)['productHandle'] as String,
     ),
     Routes.CART: (context) => const CartScreen(),
     Routes.CHECKOUT: (context) => const CheckoutScreen(),
@@ -157,5 +163,6 @@ class AppPages {
     Routes.PROFILE: (context) => const ProfileScreen(),
     Routes.NOTIFICATIONS: (context) => const NotificationsScreen(),
     Routes.COMPANY_INFO: (context) => const CompanyInfoScreen(),
+    Routes.PRODUCT_BROWSE: (context) => const ProductBrowseScreen(),
   };
 }

@@ -70,7 +70,7 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
           _categories = categories;
           _isLoadingCategories = false;
           if (categories.isNotEmpty) {
-            _selectedCategory = categories[0].name;
+            _selectedCategory = categories[0].title;
             _tabController = TabController(length: categories.length, vsync: this);
           }
         });
@@ -89,7 +89,10 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
   
   Future<void> _loadProducts() async {
     final productService = Provider.of<ProductService>(context, listen: false);
-    await productService.fetchProducts(refresh: true);
+    if (_categories.isNotEmpty) {
+      final firstCategory = _categories.first;
+      await productService.fetchProductsByCollection(firstCategory.handle, refresh: true);
+    }
     
     // Extract unique product types from products
     if (productService.products.isNotEmpty) {
@@ -110,7 +113,14 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
 
   Future<void> _refreshProducts() async {
     final productService = Provider.of<ProductService>(context, listen: false);
-    await productService.fetchProducts(refresh: true);
+    if (_categories.isNotEmpty) {
+      // Find the category that matches the selected category name
+      final selectedCategoryObj = _categories.firstWhere(
+        (cat) => cat.title == _selectedCategory,
+        orElse: () => _categories.first,
+      );
+      await productService.fetchProductsByCollection(selectedCategoryObj.handle, refresh: true);
+    }
   }
 
   @override
@@ -308,23 +318,27 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
     );
   }
   
-  void _applyFilters() async {
-    // Implementation will depend on API capabilities
+  // Apply filters
+  Future<void> _applyFilters() async {
     final productService = Provider.of<ProductService>(context, listen: false);
+    
+    // Reset pagination and fetch products with filters
     productService.resetPagination();
-    await productService.fetchProducts(refresh: true);
+    
+    if (_categories.isNotEmpty) {
+      // Find the category that matches the selected category name
+      final selectedCategoryObj = _categories.firstWhere(
+        (cat) => cat.title == _selectedCategory,
+        orElse: () => _categories.first,
+      );
+      await productService.fetchProductsByCollection(selectedCategoryObj.handle, refresh: true);
+    }
   }
-  
-  void _applySorting(String sortOption) async {
-    setState(() {
-      _sortOption = sortOption;
-    });
-    
-    final productService = Provider.of<ProductService>(context, listen: false);
-    productService.resetPagination();
-    
-    String sortBy = 'createdAt';
-    String direction = 'DESC';
+
+  // Apply sort
+  Future<void> _applySorting(String sortOption) async {
+    String sortBy;
+    String direction;
     
     switch (sortOption) {
       case 'Newest':
@@ -332,18 +346,51 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
         direction = 'DESC';
         break;
       case 'Price Low to High':
-        // This assumes your API can sort by the lowest variant price
         sortBy = 'price';
         direction = 'ASC';
         break;
       case 'Price High to Low':
-        // This assumes your API can sort by the highest variant price
         sortBy = 'price';
         direction = 'DESC';
         break;
+      default:
+        sortBy = 'createdAt';
+        direction = 'DESC';
     }
     
-    await productService.sortProducts(sortBy, direction);
+    setState(() {
+      _sortOption = sortOption;
+    });
+    
+    // Since we've updated to use the new API, we need to handle sorting differently
+    // This is a placeholder for now - the actual implementation would depend on your backend
+    final productService = Provider.of<ProductService>(context, listen: false);
+    if (_categories.isNotEmpty) {
+      final selectedCategoryObj = _categories.firstWhere(
+        (cat) => cat.title == _selectedCategory,
+        orElse: () => _categories.first,
+      );
+      await productService.fetchProductsByCollection(selectedCategoryObj.handle, refresh: true);
+    }
+  }
+
+  // Search products
+  Future<void> _searchProducts(String value) async {
+    if (value.isEmpty) {
+      _refreshProducts();
+      return;
+    }
+    
+    // Since we've updated to use the new API, we need to handle search differently
+    // This is a placeholder for now - the actual implementation would depend on your backend
+    final productService = Provider.of<ProductService>(context, listen: false);
+    if (_categories.isNotEmpty) {
+      final selectedCategoryObj = _categories.firstWhere(
+        (cat) => cat.title == _selectedCategory,
+        orElse: () => _categories.first,
+      );
+      await productService.fetchProductsByCollection(selectedCategoryObj.handle, refresh: true);
+    }
   }
 
   @override
@@ -387,8 +434,7 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
               ),
               onSubmitted: (value) async {
                 if (value.isNotEmpty) {
-                  final productService = Provider.of<ProductService>(context, listen: false);
-                  await productService.searchProducts(value);
+                  await _searchProducts(value);
                 }
               },
             ),
@@ -510,105 +556,37 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
   }
   
   Widget _buildProductCard(Product product) {
-    // Find the lowest price variant
-    double lowestPrice = double.infinity;
-    double? compareAtPrice;
-    
-    if (product.variants.isNotEmpty) {
-      for (final variant in product.variants) {
-        if (variant.price < lowestPrice) {
-          lowestPrice = variant.price;
-          compareAtPrice = variant.compareAtPrice;
-        }
-      }
-    }
-    
-    // If no variants or price is still infinity, set a default
-    if (lowestPrice == double.infinity) {
-      lowestPrice = 0;
-    }
-    
-    // Calculate discount percentage if there's a compare price
-    String? discountText;
-    if (compareAtPrice != null && compareAtPrice > lowestPrice && lowestPrice > 0) {
-      final discount = ((compareAtPrice - lowestPrice) / compareAtPrice * 100).round();
-      discountText = '-$discount%';
-    }
-    
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductDetailScreen(productId: product.id),
-          ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 4,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: () => _navigateToProductDetail(product),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product image with discount badge
-            Stack(
-              children: [
-                AspectRatio(
-                  aspectRatio: 1,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                    child: product.images.isNotEmpty
-                        ? Image.network(
-                            product.images[0],
+            // Product image
+            AspectRatio(
+              aspectRatio: 1,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                child: product.images.isNotEmpty
+                    ? Image.network(
+                        product.images.first.src,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/placeholder.png',
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.grey[200],
-                                child: const Center(
-                                  child: Icon(Icons.image_not_supported, size: 40),
-                                ),
-                              );
-                            },
-                          )
-                        : Container(
-                            color: Colors.grey[200],
-                            child: const Center(
-                              child: Icon(Icons.image, size: 40),
-                            ),
-                          ),
-                  ),
-                ),
-                if (discountText != null)
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(4),
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        'assets/images/placeholder.png',
+                        fit: BoxFit.cover,
                       ),
-                      child: Text(
-                        discountText,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+              ),
             ),
             
             // Product info
@@ -641,26 +619,52 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                   Row(
                     children: [
                       Text(
-                        '${lowestPrice.toStringAsFixed(0)} VND',
+                        '${product.price.toStringAsFixed(0)} VND',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                           color: AppColors.primary,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(width: 4),
-                      if (compareAtPrice != null && compareAtPrice > lowestPrice)
-                        Expanded(
-                          child: Text(
-                            '${compareAtPrice.toStringAsFixed(0)} VND',
-                            style: const TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: Colors.grey,
-                              fontSize: 12,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                      // Remove the compareAtPrice references since it's not in our Product model
+                      Expanded(
+                        child: IconButton(
+                          icon: const Icon(Icons.add_circle, color: AppColors.primary),
+                          onPressed: () {
+                            final cartService = Provider.of<CartService>(context, listen: false);
+                            if (product.variants.isNotEmpty) {
+                              cartService.addItem(
+                                product.variants[0].id as String,
+                                product.title,
+                                product.variants[0].price as double,
+                                product.images.isNotEmpty ? product.images.first.src : '',
+                                quantity: 1,
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Added ${product.title} to cart'),
+                                  duration: const Duration(seconds: 2),
+                                  action: SnackBarAction(
+                                    label: 'VIEW CART',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const CartScreen()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          iconSize: 24,
                         ),
+                      ),
                     ],
                   ),
                 ],
@@ -668,6 +672,15 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _navigateToProductDetail(Product product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProductDetailScreen(productHandle: product.handle),
       ),
     );
   }

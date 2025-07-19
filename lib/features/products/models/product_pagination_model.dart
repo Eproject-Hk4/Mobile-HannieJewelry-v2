@@ -68,7 +68,7 @@ class Sort {
 class ProductResponse {
   final String message;
   final int code;
-  final ProductData data;
+  final ProductResponseData data;
 
   ProductResponse({
     required this.message,
@@ -80,7 +80,7 @@ class ProductResponse {
     return ProductResponse(
       message: map['message'] ?? '',
       code: map['code'] ?? 0,
-      data: ProductData.fromMap(map['data'] ?? {}),
+      data: ProductResponseData.fromMap(map['data'] ?? {}),
     );
   }
 
@@ -93,15 +93,15 @@ class ProductResponse {
   }
 }
 
-class ProductData {
+class ProductResponseData {
   final ProductPagination result;
 
-  ProductData({
+  ProductResponseData({
     required this.result,
   });
 
-  factory ProductData.fromMap(Map<String, dynamic> map) {
-    return ProductData(
+  factory ProductResponseData.fromMap(Map<String, dynamic> map) {
+    return ProductResponseData(
       result: ProductPagination.fromMap(map['result'] ?? {}),
     );
   }

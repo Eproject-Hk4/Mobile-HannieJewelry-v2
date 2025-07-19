@@ -3,6 +3,7 @@ abstract class Routes {
   static const LOGIN = '/login';
   static const HOME = '/home';
   static const PRODUCT_DETAIL = '/product-detail';
+  static const PRODUCT_BROWSE = '/products';
   static const CART = '/cart';
   static const CHECKOUT = '/checkout';
   static const ORDER_SUCCESS = '/order-success';

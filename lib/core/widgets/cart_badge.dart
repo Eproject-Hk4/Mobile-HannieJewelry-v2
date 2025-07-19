@@ -9,11 +9,13 @@ import '../../features/cart/services/cart_service.dart';
 class CartBadge extends StatelessWidget {
   final int? count;
   final VoidCallback? onPressed;
+  final VoidCallback? onTap;
   
   const CartBadge({
     Key? key,
     this.count,
     this.onPressed,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -27,7 +29,7 @@ class CartBadge extends StatelessWidget {
         children: [
           IconButton(
             icon: const Icon(Icons.shopping_cart),
-            onPressed: onPressed ?? () {
+            onPressed: onTap ?? onPressed ?? () {
               // Check login before opening cart
               if (authService.isAuthenticated) {
                 Navigator.push(

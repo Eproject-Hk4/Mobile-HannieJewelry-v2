@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import '../../../app/app_config.dart';
 import '../../../core/services/api_service.dart';
 import '../models/product_model.dart';
 import '../models/product_category_model.dart';
@@ -12,11 +13,12 @@ class ProductService extends ChangeNotifier {
   List<Product> _products = [];
   ProductPagination? _productPagination;
   List<ProductCategory> _categories = [];
+  ProductCategory? _selectedCategory;
   bool _isLoading = false;
   bool _isLoadingMore = false;
   bool _isLoadingCategories = false;
   String _error = '';
-  int _currentPage = 0;
+  int _currentPage = 1;
   int _pageSize = 10;
 
   ProductService(this._apiService);
@@ -25,6 +27,7 @@ class ProductService extends ChangeNotifier {
   List<Product> get products => _products;
   ProductPagination? get productPagination => _productPagination;
   List<ProductCategory> get categories => _categories;
+  ProductCategory? get selectedCategory => _selectedCategory;
   bool get isLoading => _isLoading;
   bool get isLoadingMore => _isLoadingMore;
   bool get isLoadingCategories => _isLoadingCategories;
@@ -32,12 +35,52 @@ class ProductService extends ChangeNotifier {
   int get currentPage => _currentPage;
   int get pageSize => _pageSize;
   bool get hasMoreProducts => _productPagination != null && 
-    _currentPage < _productPagination!.totalPages - 1;
+    _currentPage < _productPagination!.totalPages;
 
-  // Fetch products with pagination
-  Future<void> fetchProducts({bool refresh = false}) async {
+  // Set selected category
+  void setSelectedCategory(ProductCategory category) {
+    _selectedCategory = category;
+    notifyListeners();
+  }
+
+  // Fetch all collections (categories)
+  Future<List<ProductCategory>> fetchCategories() async {
+    _isLoadingCategories = true;
+    _error = '';
+    notifyListeners();
+    
+    try {
+      final response = await _apiService.get('/api/client/collections');
+      
+      if (response['code'] == 200 && response['data'] != null) {
+        final List<dynamic> categoriesJson = response['data'];
+        final fetchedCategories = categoriesJson.map((json) => ProductCategory.fromMap(json)).toList();
+        
+        _categories = fetchedCategories;
+        if (_categories.isNotEmpty && _selectedCategory == null) {
+          _selectedCategory = _categories.first;
+        }
+        _isLoadingCategories = false;
+        notifyListeners();
+        return fetchedCategories;
+      } else {
+        _error = 'Failed to load categories: ${response['message'] ?? 'Unknown error'}';
+        _isLoadingCategories = false;
+        notifyListeners();
+        return [];
+      }
+    } catch (e) {
+      _error = 'Error fetching categories: $e';
+      _isLoadingCategories = false;
+      notifyListeners();
+      return [];
+    }
+  }
+
+  // Fetch products by collection handle with pagination
+  Future<void> fetchProductsByCollection(String collectionHandle, {bool refresh = false}) async {
     if (refresh) {
-      _currentPage = 0;
+      _currentPage = 1;
       _isLoading = true;
     } else if (_isLoadingMore) {
       return;
@@ -51,17 +94,28 @@ class ProductService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _apiService.get('/api/products?page=$_currentPage&size=$_pageSize');
+      // Use the correct API endpoint format
+      final response = await _apiService.get('/api/client/collections/$collectionHandle/products?page=$_currentPage&size=$_pageSize');
       
       if (response['code'] == 200 && response['data'] != null) {
-        final productResponse = ProductResponse.fromMap(response);
-        final pagination = productResponse.data.result;
+        final productData = response['data']['result'];
+        final List<dynamic> productsJson = productData['content'] ?? [];
+        final List<Product> fetchedProducts = productsJson.map((json) => Product.fromMap(json)).toList();
+        
+        final pagination = ProductPagination(
+          content: fetchedProducts,
+          page: productData['page'] ?? 1,
+          size: productData['size'] ?? 10,
+          totalElements: productData['total_elements'] ?? 0,
+          totalPages: productData['total_pages'] ?? 0,
+          sorts: List<Sort>.from((productData['sorts'] ?? []).map((sort) => Sort.fromMap(sort))),
+        );
         
         if (refresh) {
-          _products = pagination.content;
+          _products = fetchedProducts;
           _productPagination = pagination;
         } else {
-          _products.addAll(pagination.content);
+          _products.addAll(fetchedProducts);
           _productPagination = pagination;
           _currentPage++;
         }
@@ -83,168 +137,84 @@ class ProductService extends ChangeNotifier {
     }
   }
 
-  // Load more products
+  // Load more products for the current collection
   Future<void> loadMoreProducts() async {
-    if (!hasMoreProducts || _isLoadingMore) {
+    if (!hasMoreProducts || _isLoadingMore || _selectedCategory == null) {
       return;
     }
     
-    _currentPage++;
-    await fetchProducts();
+    await fetchProductsByCollection(_selectedCategory!.handle);
   }
 
-  // Fetch product by ID
-  Future<Product?> fetchProductById(String id) async {
-    _isLoading = true;
-    _error = '';
-    notifyListeners();
-
+  // Fetch product details by product handle
+  Future<Product?> fetchProductByHandle(String productHandle) async {
+    // Set loading state outside of the build phase
+    Future.microtask(() {
+      _isLoading = true;
+      _error = '';
+      notifyListeners();
+    });
+    
     try {
-      final response = await _apiService.get('/api/products/$id');
+      // Use the correct API endpoint for product details
+      final response = await _apiService.get('/api/client/collections/$productHandle');
       
       if (response['code'] == 200 && response['data'] != null) {
         final productJson = response['data'];
         final product = Product.fromMap(productJson);
-        
-        _isLoading = false;
-        notifyListeners();
         return product;
       } else {
         _error = 'Failed to load product: ${response['message'] ?? 'Unknown error'}';
-        _isLoading = false;
-        notifyListeners();
         return null;
       }
     } catch (e) {
       _error = 'Error fetching product: $e';
-      _isLoading = false;
-      notifyListeners();
       return null;
-    }
-  }
-
-  // Fetch product categories
-  Future<List<ProductCategory>> fetchCategories() async {
-    _isLoadingCategories = true;
-    _error = '';
-    
-    try {
-      final response = await _apiService.get('/api/product-categories');
-      
-      if (response['code'] == 200 && response['data'] != null) {
-        final List<dynamic> categoriesJson = response['data'];
-        final fetchedCategories = categoriesJson.map((json) => ProductCategory.fromMap(json)).toList();
-        
-        // Update state and notify listeners only once at the end
-        _categories = fetchedCategories;
-        _isLoadingCategories = false;
+    } finally {
+      // Update loading state outside of the build phase
+      Future.microtask(() {
+        _isLoading = false;
         notifyListeners();
-        return fetchedCategories;
-      } else {
-        _error = 'Failed to load categories: ${response['message'] ?? 'Unknown error'}';
-        _isLoadingCategories = false;
-        notifyListeners();
-        return [];
-      }
-    } catch (e) {
-      _error = 'Error fetching categories: $e';
-      _isLoadingCategories = false;
-      notifyListeners();
-      return [];
-    }
-  }
-
-  // Search products by title
-  Future<List<Product>> searchProducts(String query) async {
-    if (query.isEmpty) {
-      return _products;
-    }
-    
-    try {
-      final response = await _apiService.get('/api/products?search=$query&page=0&size=$_pageSize');
-      
-      if (response['code'] == 200 && response['data'] != null) {
-        final productResponse = ProductResponse.fromMap(response);
-        return productResponse.data.result.content;
-      } else {
-        _error = 'Failed to search products: ${response['message'] ?? 'Unknown error'}';
-        notifyListeners();
-        return [];
-      }
-    } catch (e) {
-      _error = 'Error searching products: $e';
-      notifyListeners();
-      return [];
-    }
-  }
-
-  // Filter products by category
-  Future<List<Product>> filterByCategory(String category) async {
-    if (category.isEmpty) {
-      return _products;
-    }
-    
-    try {
-      final response = await _apiService.get('/api/products?category=$category&page=0&size=$_pageSize');
-      
-      if (response['code'] == 200 && response['data'] != null) {
-        final productResponse = ProductResponse.fromMap(response);
-        return productResponse.data.result.content;
-      } else {
-        _error = 'Failed to filter products: ${response['message'] ?? 'Unknown error'}';
-        notifyListeners();
-        return [];
-      }
-    } catch (e) {
-      _error = 'Error filtering products: $e';
-      notifyListeners();
-      return [];
-    }
-  }
-
-  // Filter products by price range
-  Future<List<Product>> filterByPriceRange(double minPrice, double maxPrice) async {
-    try {
-      final response = await _apiService.get('/api/products?minPrice=$minPrice&maxPrice=$maxPrice&page=0&size=$_pageSize');
-      
-      if (response['code'] == 200 && response['data'] != null) {
-        final productResponse = ProductResponse.fromMap(response);
-        return productResponse.data.result.content;
-      } else {
-        _error = 'Failed to filter products by price: ${response['message'] ?? 'Unknown error'}';
-        notifyListeners();
-        return [];
-      }
-    } catch (e) {
-      _error = 'Error filtering products by price: $e';
-      notifyListeners();
-      return [];
-    }
-  }
-
-  // Sort products by various criteria
-  Future<List<Product>> sortProducts(String sortBy, String direction) async {
-    try {
-      final response = await _apiService.get('/api/products?sort=$sortBy,$direction&page=0&size=$_pageSize');
-      
-      if (response['code'] == 200 && response['data'] != null) {
-        final productResponse = ProductResponse.fromMap(response);
-        return productResponse.data.result.content;
-      } else {
-        _error = 'Failed to sort products: ${response['message'] ?? 'Unknown error'}';
-        notifyListeners();
-        return [];
-      }
-    } catch (e) {
-      _error = 'Error sorting products: $e';
-      notifyListeners();
-      return [];
+      });
     }
   }
   
+  // Fetch product by ID
+  Future<Product?> fetchProductById(String id) async {
+    // Set loading state outside of the build phase
+    Future.microtask(() {
+      _isLoading = true;
+      _error = '';
+      notifyListeners();
+    });
+    
+    try {
+      // Use the correct API endpoint for product details by ID
+      final response = await _apiService.get('/api/client/products/$id');
+      
+      if (response['code'] == 200 && response['data'] != null) {
+        final productJson = response['data'];
+        final product = Product.fromMap(productJson);
+        return product;
+      } else {
+        _error = 'Failed to load product: ${response['message'] ?? 'Unknown error'}';
+        return null;
+      }
+    } catch (e) {
+      _error = 'Error fetching product: $e';
+      return null;
+    } finally {
+      // Update loading state outside of the build phase
+      Future.microtask(() {
+        _isLoading = false;
+        notifyListeners();
+      });
+    }
+  }
+
   // Reset pagination
   void resetPagination() {
-    _currentPage = 0;
+    _currentPage = 1;
     _products = [];
     _productPagination = null;
     notifyListeners();

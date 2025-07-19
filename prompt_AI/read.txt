@@ -1,0 +1,215 @@
+# Jewelry E-commerce API & UI Specification
+
+This document describes the API usage and UI logic for a jewelry e-commerce product selection page, supporting dynamic data from the backend.
+
+---
+
+## 1. Overview
+
+The page displays collections (categories) as tabs at the top (e.g., Bracelets, Rings, Earrings...). When a user clicks a tab, products belonging to the selected collection are shown below in a grid layout. All collection and product data are loaded dynamically via API.
+
+---
+
+## 2. API Endpoints and Usage
+
+### Get Collections (Categories)
+
+**Endpoint:**
+GET https://nguyenhauweb.software/api/client/collections
+
+pgsql
+Copy
+Edit
+
+**Sample Response:**
+```json
+{
+    "message": "Success",
+    "code": 200,
+    "data": [
+        {
+            "id": "64ceee18-92d8-438c-b851-110791deafe1",
+            "body_html": "Category of general jewelry products",
+            "created_at": "2025-07-18T05:21:14.220096Z",
+            "handle": "trang-sc-tng-hp",
+            "image": {
+                "created_at": null,
+                "src": null
+            },
+            "items_count": 2,
+            "published": true,
+            "published_at": "2025-07-18T05:21:14.177664Z",
+            "published_scope": "web",
+            "sort_order": "alpha_asc",
+            "template_suffix": null,
+            "title": "General Jewelry",
+            "updated_at": "2025-07-18T05:21:14.220122Z"
+        }
+    ]
+}
+Usage:
+
+Extract title and handle from each collection object.
+
+Display each collection as a tab in the UI.
+
+When a tab is clicked, use its handle to query products.
+
+By default, on page load, fetch the first collection.
+
+Get Products by Collection
+Endpoint:
+
+ruby
+Copy
+Edit
+GET https://nguyenhauweb.software/api/client/collections/{{HANDLE_COLLECTION}}/products
+Replace {{HANDLE_COLLECTION}} with the handle value of the selected collection.
+
+Sample Response:
+
+json
+Copy
+Edit
+{
+    "message": "Success",
+    "code": 200,
+    "data": {
+        "result": {
+            "content": [
+                {
+                    "body_html": "",
+                    "created_at": "2025-07-18T05:07:53.900010Z",
+                    "handle": "product-image-2025",
+                    "id": "8da6935c-264e-4b57-9169-b030b5471b2a",
+                    "product_type": "Women's Bracelet",
+                    "published_at": "2025-07-18T05:07:53.845Z",
+                    "published_scope": "global",
+                    "template_suffix": "product",
+                    "title": "product-image-2025",
+                    "updated_at": "2025-07-18T05:07:53.900039Z",
+                    "vendor": "Loc Phat Jewelry",
+                    "not_allow_promotion": false,
+                    "available": true,
+                    "tags": "",
+                    "sole_quantity": 0,
+                    "images": [],
+                    "image": null,
+                    "options": [],
+                    "variants": []
+                },
+                {
+                    "body_html": "",
+                    "created_at": "2025-07-18T04:56:20.381274Z",
+                    "handle": "valid-product-image",
+                    "id": "60dbff01-bc38-43e8-985d-ae94d6848f58",
+                    "product_type": "Women's Bracelet",
+                    "published_at": "2025-07-18T04:56:20.250Z",
+                    "published_scope": "global",
+                    "template_suffix": "product",
+                    "title": "valid-product-image",
+                    "updated_at": "2025-07-18T04:56:20.381291Z",
+                    "vendor": "Loc Phat Jewelry",
+                    "not_allow_promotion": false,
+                    "available": true,
+                    "tags": "",
+                    "sole_quantity": 0,
+                    "images": [
+                        {
+                            "created_at": "2025-07-18T05:46:50.097843Z",
+                            "id": "85e32254-7b18-4d14-a737-1a607819b650",
+                            "position": 1,
+                            "product_id": "60dbff01-bc38-43e8-985d-ae94d6848f58",
+                            "updated_at": "2025-07-18T05:46:50.097856Z",
+                            "src": "https://res.cloudinary.com/dvtcwbbck/image/upload/v1752817609/product-60dbff01-bc38-43e8-985d-ae94d6848f58-1752817606872.png",
+                            "alt": null,
+                            "variant_ids": null
+                        }
+                    ],
+                    "image": {
+                        "created_at": "2025-07-18T05:46:50.097843Z",
+                        "id": "85e32254-7b18-4d14-a737-1a607819b650",
+                        "position": 1,
+                        "product_id": "60dbff01-bc38-43e8-985d-ae94d6848f58",
+                        "updated_at": "2025-07-18T05:46:50.097856Z",
+                        "src": "https://res.cloudinary.com/dvtcwbbck/image/upload/v1752817609/product-60dbff01-bc38-43e8-985d-ae94d6848f58-1752817606872.png",
+                        "alt": null,
+                        "variant_ids": null
+                    },
+                    "options": [],
+                    "variants": []
+                }
+            ],
+            "page": 1,
+            "size": 10,
+            "total_elements": 2,
+            "total_pages": 1,
+            "sorts": [
+                {
+                    "property": "createdAt",
+                    "direction": "DESC"
+                }
+            ]
+        }
+    }
+}
+Usage:
+
+Extract title, product_type, image.src, vendor, available, and (if available) variants, price, options, etc.
+
+Display each product as a card in a 2-column grid.
+
+Each product card should include: image, product name, price, and an add (+) button.
+
+If no image is available, use a placeholder.
+
+If no products are found, show an appropriate message.
+
+3. UI Logic & Structure
+On page load, fetch all collections and automatically select the first tab.
+
+When a user selects another tab, fetch products for the selected collection using its handle.
+
+Products are shown in a responsive grid with 2 columns (mobile-first design).
+
+Each product card includes:
+
+Product image (or placeholder)
+
+Product name
+
+Price (if available)
+
+Add (+) button
+
+Example UI structure:
+
+mathematica
+Copy
+Edit
+Tabs: [General Jewelry] [Rings] [Earrings] ...
+Below, display product grid:
+
+[Image]
+Product Name
+Price
+[+] (Add button)
+4. Pseudo Code Example
+js
+Copy
+Edit
+// Fetch collections and display tabs
+const collections = await GET('/api/client/collections');
+setTabs(collections.data.map(x => ({ title: x.title, handle: x.handle })));
+
+// On tab select
+const products = await GET(`/api/client/collections/${selectedHandle}/products`);
+renderProducts(products.data.result.content);
+5. Notes
+Always fetch dynamic data from the API; do not hardcode tabs or products.
+
+Update tabs and products when new API data is received.
+
+Design is mobile-first with rounded cards, subtle shadows, and clear typography.
+
+All API responses and UI should be robust to missing data (e.g., missing images).

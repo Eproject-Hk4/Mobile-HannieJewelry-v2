@@ -9,11 +9,11 @@ import '../models/product_model.dart';
 import '../services/product_service.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final String productId;
+  final String productHandle;
   
   const ProductDetailScreen({
     Key? key,
-    required this.productId,
+    required this.productHandle,
   }) : super(key: key);
 
   @override
@@ -26,11 +26,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   String _error = '';
   int _selectedVariantIndex = 0;
   int _quantity = 1;
+  int _currentImageIndex = 0;
+  final PageController _pageController = PageController();
   
   @override
   void initState() {
     super.initState();
     _loadProduct();
+  }
+  
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
   
   Future<void> _loadProduct() async {
@@ -41,7 +49,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     
     try {
       final productService = Provider.of<ProductService>(context, listen: false);
-      final product = await productService.fetchProductById(widget.productId);
+      
+      // Use the handle to fetch the product
+      final product = await productService.fetchProductByHandle(widget.productHandle);
       
       if (mounted) {
         setState(() {
@@ -97,8 +107,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     cartService.addItem(
       variant.id.toString(),
       _product!.title,
-      variant.price,
-      _product!.images.isNotEmpty ? _product!.images[0] : '',
+      variant.priceAsDouble,
+      _product!.images.isNotEmpty ? _product!.images.first.src : '',
       quantity: _quantity,
       variant: variant.title,
     );
@@ -123,8 +133,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Product Details'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           Consumer<CartService>(
             builder: (context, cartService, child) {
@@ -172,201 +188,246 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Product image
-          AspectRatio(
-            aspectRatio: 1,
-            child: _product!.images.isNotEmpty
-                ? Image.network(
-                    _product!.images[0],
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: Icon(Icons.image_not_supported, size: 60),
-                        ),
+          // Image gallery with page indicator
+          Stack(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.width,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: _product!.images.isNotEmpty ? _product!.images.length : 1,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentImageIndex = index;
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    if (_product!.images.isEmpty) {
+                      return Image.asset(
+                        'assets/images/placeholder.png',
+                        fit: BoxFit.cover,
                       );
-                    },
-                  )
-                : Container(
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: Icon(Icons.image, size: 60),
+                    }
+                    return Image.network(
+                      _product!.images[index].src,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          'assets/images/placeholder.png',
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+              // Page indicator
+              if (_product!.images.length > 1)
+                Positioned(
+                  bottom: 16,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '${_currentImageIndex + 1}/${_product!.images.length}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
+                ),
+            ],
           ),
           
-          // Product info
+          // Product title and price
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (_product!.vendor.isNotEmpty)
-                  Text(
-                    _product!.vendor,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
-                  ),
-                const SizedBox(height: 8),
                 Text(
                   _product!.title,
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 16),
-                
-                // Price section
+                const SizedBox(height: 8),
                 if (_product!.variants.isNotEmpty) ...[
                   Row(
                     children: [
                       Text(
-                        '${_product!.variants[_selectedVariantIndex].price.toStringAsFixed(0)} VND',
+                        _formatPrice(_product!.variants[_selectedVariantIndex].priceAsDouble),
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      if (_product!.variants[_selectedVariantIndex].compareAtPrice > 0 &&
-                          _product!.variants[_selectedVariantIndex].compareAtPrice > _product!.variants[_selectedVariantIndex].price)
+                      if (_product!.variants[_selectedVariantIndex].compareAtPriceAsDouble > 
+                          _product!.variants[_selectedVariantIndex].priceAsDouble)
                         Text(
-                          '${_product!.variants[_selectedVariantIndex].compareAtPrice.toStringAsFixed(0)} VND',
+                          _formatPrice(_product!.variants[_selectedVariantIndex].compareAtPriceAsDouble),
                           style: const TextStyle(
+                            fontSize: 16,
                             decoration: TextDecoration.lineThrough,
                             color: Colors.grey,
-                            fontSize: 14,
                           ),
                         ),
                     ],
                   ),
-                  const SizedBox(height: 8),
                   Text(
-                    'In stock: ${_product!.variants[_selectedVariantIndex].inventoryQuantity}',
+                    'Còn ${_product!.variants[_selectedVariantIndex].inventoryQuantity} sản phẩm',
                     style: TextStyle(
                       color: _product!.variants[_selectedVariantIndex].inventoryQuantity > 0
                           ? Colors.green
                           : Colors.red,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+                
+                const Divider(height: 32),
+                
+                // Product details
+                const Text(
+                  'Chi tiết sản phẩm',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // Product code
+                _buildDetailRow('Mã sản phẩm', _extractProductCode(_product!.title)),
+                
+                // Product type
+                if (_product!.productType.isNotEmpty)
+                  _buildDetailRow('Loại sản phẩm', _product!.productType),
+                
+                // Vendor
+                if (_product!.vendor.isNotEmpty)
+                  _buildDetailRow('Thương hiệu', _product!.vendor),
+                
+                // Options
+                if (_product!.options.isNotEmpty)
+                  ..._product!.options.map((option) => 
+                    _buildDetailRow(option.name, option.values.join(', '))
+                  ),
+                
+                const Divider(height: 32),
+                
+                // Product description
+                if (_product!.bodyHtml.isNotEmpty) ...[
+                  const Text(
+                    'Mô tả sản phẩm',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    _product!.bodyHtml,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      height: 1.5,
                     ),
                   ),
                 ],
                 
                 const SizedBox(height: 24),
                 
-                // Variants section
-                if (_product!.options.isNotEmpty && _product!.variants.length > 1) ...[
+                // Variants
+                if (_product!.variants.length > 1) ...[
                   const Text(
-                    'Options',
+                    'Lựa chọn',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  
-                  // Display options
-                  for (final option in _product!.options) ...[
-                    Text(
-                      option.name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _getUniqueOptionValues(option.name).map((value) {
-                        final isSelected = _isOptionValueSelected(option.name, value);
-                        return ChoiceChip(
-                          label: Text(value),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            if (selected) {
-                              _selectVariantByOption(option.name, value);
-                            }
-                          },
-                          backgroundColor: Colors.white,
-                          selectedColor: AppColors.primary.withOpacity(0.1),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(
-                              color: isSelected ? AppColors.primary : Colors.grey.shade300,
-                            ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: List.generate(_product!.variants.length, (index) {
+                      final variant = _product!.variants[index];
+                      final isSelected = _selectedVariantIndex == index;
+                      
+                      return ChoiceChip(
+                        label: Text(variant.title),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() {
+                              _selectedVariantIndex = index;
+                            });
+                          }
+                        },
+                        backgroundColor: Colors.white,
+                        selectedColor: AppColors.primary.withOpacity(0.1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: isSelected ? AppColors.primary : Colors.grey.shade300,
                           ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 24),
                 ],
                 
                 // Quantity selector
-                const Text(
-                  'Quantity',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
                 Row(
                   children: [
-                    IconButton(
-                      onPressed: _decrementQuantity,
-                      icon: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        padding: const EdgeInsets.all(2),
-                        child: const Icon(Icons.remove, size: 16),
-                      ),
-                    ),
-                    Text(
-                      _quantity.toString(),
-                      style: const TextStyle(
+                    const Text(
+                      'Số lượng:',
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    IconButton(
-                      onPressed: _incrementQuantity,
-                      icon: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        padding: const EdgeInsets.all(2),
-                        child: const Icon(Icons.add, size: 16),
+                    const SizedBox(width: 16),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: _decrementQuantity,
+                            icon: const Icon(Icons.remove, size: 16),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                          ),
+                          Text(
+                            _quantity.toString(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: _incrementQuantity,
+                            icon: const Icon(Icons.add, size: 16),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                ),
-                
-                const SizedBox(height: 24),
-                
-                // Product description
-                const Text(
-                  'Description',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _product!.bodyPlain.isNotEmpty ? _product!.bodyPlain : _product!.bodyHtml,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    height: 1.5,
-                  ),
                 ),
               ],
             ),
@@ -376,14 +437,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
   
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
   Widget _buildBottomBar() {
-    if (_product == null || _product!.variants.isEmpty) {
-      return const SizedBox.shrink();
-    }
-    
-    final variant = _product!.variants[_selectedVariantIndex];
-    final isOutOfStock = variant.inventoryQuantity <= 0;
-    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -400,42 +484,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       child: Row(
         children: [
           Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Total Price',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-                Text(
-                  '${(variant.price * _quantity).toStringAsFixed(0)} VND',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: isOutOfStock ? null : _addToCart,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(vertical: 12),
+            child: OutlinedButton(
+              onPressed: () {},
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                side: BorderSide(color: AppColors.primary),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                disabledBackgroundColor: Colors.grey,
               ),
-              child: Text(
-                isOutOfStock ? 'Out of Stock' : 'Add to Cart',
-                style: const TextStyle(
+              child: const Text(
+                'Thêm vào giỏ hàng',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: _addToCart,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Mua ngay',
+                style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
@@ -447,87 +526,52 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
   
-  // Get unique option values for a specific option name
-  List<String> _getUniqueOptionValues(String optionName) {
-    final Set<String> uniqueValues = {};
-    
-    if (_product == null) return [];
-    
-    for (final variant in _product!.variants) {
-      if (optionName == _product!.options[0].name && variant.option1.isNotEmpty) {
-        uniqueValues.add(variant.option1);
-      } else if (optionName == _product!.options[1].name && variant.option2 != null) {
-        uniqueValues.add(variant.option2!);
-      } else if (optionName == _product!.options[2].name && variant.option3 != null) {
-        uniqueValues.add(variant.option3!);
-      }
-    }
-    
-    return uniqueValues.toList();
+  // Helper methods to extract product information
+  String _extractProductCode(String title) {
+    // Extract product code from title (e.g., "Lắc tay LPTB 382" -> "LPTB 382")
+    final RegExp regex = RegExp(r'([A-Z]+\s*\d+)');
+    final match = regex.firstMatch(title);
+    return match != null ? match.group(1)! : title;
   }
   
-  // Check if an option value is selected in the current variant
-  bool _isOptionValueSelected(String optionName, String optionValue) {
-    if (_product == null || _selectedVariantIndex >= _product!.variants.length) {
-      return false;
+  String _extractMaterial(String description) {
+    // Extract material info from description
+    if (description.contains('AU585')) {
+      return 'AU585';
+    } else if (description.contains('AU750')) {
+      return 'AU750';
+    } else if (description.contains('Vàng')) {
+      return 'Vàng';
     }
-    
-    final variant = _product!.variants[_selectedVariantIndex];
-    
-    if (optionName == _product!.options[0].name) {
-      return variant.option1 == optionValue;
-    } else if (optionName == _product!.options[1].name && variant.option2 != null) {
-      return variant.option2 == optionValue;
-    } else if (optionName == _product!.options[2].name && variant.option3 != null) {
-      return variant.option3 == optionValue;
-    }
-    
-    return false;
+    return 'Không có thông tin';
   }
   
-  // Select a variant based on option value
-  void _selectVariantByOption(String optionName, String optionValue) {
-    if (_product == null) return;
-    
-    // Find the variant that matches the current selection but with the new option value
-    final currentVariant = _product!.variants[_selectedVariantIndex];
-    
-    String option1 = currentVariant.option1;
-    String? option2 = currentVariant.option2;
-    String? option3 = currentVariant.option3;
-    
-    // Update the option that was selected
-    if (optionName == _product!.options[0].name) {
-      option1 = optionValue;
-    } else if (optionName == _product!.options[1].name) {
-      option2 = optionValue;
-    } else if (optionName == _product!.options[2].name) {
-      option3 = optionValue;
+  String _extractWeight(String description) {
+    // Extract weight info from description
+    final RegExp regex = RegExp(r'(\d+[\.,]?\d*)\s*g');
+    final match = regex.firstMatch(description);
+    return match != null ? '≈${match.group(1)}g' : 'Không có thông tin';
+  }
+  
+  String _extractStoneType(String description) {
+    // Extract stone type from description
+    if (description.contains('Moissanite')) {
+      return 'Moissanite';
+    } else if (description.contains('Ruby')) {
+      return 'Ruby';
+    } else if (description.contains('Sapphire')) {
+      return 'Sapphire';
+    } else if (description.contains('Diamond')) {
+      return 'Diamond';
     }
-    
-    // Find matching variant
-    for (int i = 0; i < _product!.variants.length; i++) {
-      final variant = _product!.variants[i];
-      bool matches = variant.option1 == option1;
-      
-      if (option2 != null) {
-        matches = matches && variant.option2 == option2;
-      }
-      
-      if (option3 != null) {
-        matches = matches && variant.option3 == option3;
-      }
-      
-      if (matches) {
-        setState(() {
-          _selectedVariantIndex = i;
-          // Reset quantity if it exceeds the new variant's inventory
-          if (_quantity > variant.inventoryQuantity) {
-            _quantity = variant.inventoryQuantity > 0 ? 1 : 0;
-          }
-        });
-        return;
-      }
-    }
+    return 'Không có thông tin';
+  }
+  
+  String _formatPrice(double price) {
+    // Format price as VND currency
+    return '${price.toStringAsFixed(0).replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]}.',
+    )}đ';
   }
 }

@@ -311,70 +311,50 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildFeatureItem(BuildContext context, IconData icon, String label, AuthGuardService authGuard) {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
-        Widget? destination;
-        
         switch (label) {
           case 'Earn Points':
-            destination = const PointsScreen();
+            authGuard.checkAndNavigate(context, 'Points', const PointsScreen());
             break;
           case 'Redeem':
-            destination = const RewardsScreen();
+            authGuard.checkAndNavigate(context, 'Rewards', const RewardsScreen());
             break;
           case 'Order':
-            destination = const OrderScreen();
+            Navigator.pushNamed(context, '/products');
             break;
           case 'Exchange':
-            destination = const ReturnExchangeScreen();
+            authGuard.checkAndNavigate(context, 'Exchange', const ReturnExchangeScreen());
             break;
           case 'Contact':
-            destination = const ContactScreen();
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const ContactScreen()));
             break;
           case 'Warranty':
-            destination = const WarrantyScreen();
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const WarrantyScreen()));
             break;
           case 'Tracking':
-            destination = const TrackingScreen();
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const TrackingScreen()));
             break;
           case 'Support':
-            destination = const SupportCenterScreen();
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportCenterScreen()));
             break;
           case 'Feedback':
-            destination = const FeedbackScreen();
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen()));
             break;
           case 'Survey':
-            destination = const SurveyScreen();
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const SurveyScreen()));
             break;
           case 'News':
-            destination = const NewsScreen();
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const NewsScreen()));
             break;
-          default:
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('This feature is under development'),
-                duration: Duration(seconds: 2),
-              ),
-            );
-        }
-        
-        if (destination != null) {
-          // Nếu là màn hình Order, cho phép truy cập trực tiếp mà không cần kiểm tra xác thực
-          if (label == 'Order') {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => destination as Widget),
-            );
-          } else {
-            // Các tính năng khác vẫn kiểm tra xác thực
-            authGuard.checkAndNavigate(context, label, destination);
-          }
         }
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            width: 50,
+            height: 50,
             decoration: BoxDecoration(
               color: AppColors.primary.withOpacity(0.1),
               shape: BoxShape.circle,
